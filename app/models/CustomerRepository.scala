@@ -46,4 +46,15 @@ class CustomerRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
     db.run(customer += newCustomer).map(res => "Customer successfully created")
     }
 
+//  def updateCustomer(updatedCustomer: Customer): Future[Int] = {
+//    db.run( customer.filter(_.id === updatedCustomer.id).update(updatedCustomer))
+//  }
+
+  def updateCustomer(id: Long, civility: String, firstName: String, lastName: String, email: String, phone: String, phone2: Option[String], company: Option[String], address: String, city: String, zipCode: String, VATNumber: String): Future[Int] = {
+    db.run(customer
+    .filter(_.id === id)
+    .map(x=>(x.civility, x.firstName, x.lastName, x.email, x.phone, x.phone2, x.company, x.address, x.zipCode, x.city, x.VATNumber))
+    .update(civility, firstName, lastName, email, phone, phone2, company, address, zipCode, city, VATNumber))
+  }
+
 }

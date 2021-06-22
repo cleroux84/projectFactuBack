@@ -81,4 +81,12 @@ class CustomerController @Inject()(
     }
     Future.successful(Ok)
   }
+
+  def updateCustomer(id: Long): Action[JsValue] = Action.async(parse.json) {implicit request =>
+    request.body.validate[CreateCustomerForm] match {
+      case JsSuccess(data, _) =>
+        repo.updateCustomer(id, data.civility, data.firstName, data.lastName, data.email, data.phone, data.phone2, data.company, data.address, data.city, data.zipCode, data.VATNumber).map{_ =>Ok}
+      case JsError(errors) => Future.successful(BadRequest(Json.obj("status" -> "KO", "message" ->JsError.toJson(errors))))
+    }
+  }
 }
