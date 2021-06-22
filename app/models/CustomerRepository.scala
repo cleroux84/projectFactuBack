@@ -28,12 +28,22 @@ class CustomerRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
       def city = column[String]("city")
       def zipCode = column[String]("zipCode")
       def company = column[Option[String]]("company")
+      def VATNumber = column[String]("VATNumber")
 
-    def * =  (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company) <> ((Customer.apply _).tupled, Customer.unapply)
+    def * =  (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber) <> ((Customer.apply _).tupled, Customer.unapply)
   }
   private val customer = TableQuery[CustomerTable]
 
-  def getList(): Future[Seq[Customer]] = db.run {
-    customer.result
+  def getList: Future[Seq[Customer]] = {
+  db.run(customer.result)
+}
+
+  def deleteCustomer(id: Long): Future[Int] = db.run {
+    customer.filter(_.id === id).delete
   }
+
+  def addCustomer(newCustomer: Customer): Future[String] = {
+    db.run(customer += newCustomer).map(res => "Customer successfully created")
+    }
+
 }

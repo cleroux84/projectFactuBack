@@ -4,8 +4,10 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.CustomerController.index()
+
 GET     /listCustomer               controllers.CustomerController.getCustomers()
+DELETE  /deleteCustomer/:id         controllers.CustomerController.deleteCustomer(id: Long)
+POST    /addCustomer                controllers.CustomerController.addCustomer
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
