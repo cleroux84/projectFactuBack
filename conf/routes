@@ -4,11 +4,13 @@
 # ~~~~
 
 # An example controller showing a sample home page
-
+#Customer
 GET     /listCustomer               controllers.CustomerController.getCustomers()
 DELETE  /deleteCustomer/:id         controllers.CustomerController.deleteCustomer(id: Long)
 POST    /addCustomer                controllers.CustomerController.addCustomer
 POST    /updateCustomer/:id         controllers.CustomerController.updateCustomer(id: Long)
 
+#Bills
+GET     /listBill                    controllers.BillController.getBills()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

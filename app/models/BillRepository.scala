@@ -2,10 +2,9 @@ package models
 
 import org.joda.time.DateTime
 import play.api.db.slick.DatabaseConfigProvider
+import com.github.tototoshi.slick.MySQLJodaSupport._
 import slick.jdbc.JdbcProfile
-import slick.lifted.MappedToBase.mappedToIsomorphism
 
-import java.util.Date
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 

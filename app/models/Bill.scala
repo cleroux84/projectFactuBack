@@ -2,7 +2,8 @@ package models
 
 
 import org.joda.time.DateTime
-import play.api.libs.json.Json
+import play.api.libs.json.{ Json, OWrites, Writes}
+
 
 case class Bill(
                  id: Long,
@@ -17,6 +18,8 @@ case class Bill(
                    )
 
 object Bill {
+//  implicit val jodaWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
   implicit val billFormat = Json.format[Bill]
+
 }
 

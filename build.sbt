@@ -14,7 +14,8 @@ libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "5.0.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
+  "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",
+  "com.github.tototoshi" %% "slick-joda-mapper" % "2.4.2",
 )
 libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.46"
 scalacOptions ++= Seq(
@@ -22,6 +23,13 @@ scalacOptions ++= Seq(
   "-deprecation",
   "-Xfatal-warnings"
 )
+//libraryDependencies ++= Seq(
+//  "com.typesafe.slick" %% "slick" % "5.0.0",
+//  "com.github.tototoshi" %% "slick-joda-mapper" % "2.4.2",
+//  "joda-time" % "joda-time" % "2.7",
+//  "org.joda" % "joda-convert" % "1.7"
+//)
+
 
 
 

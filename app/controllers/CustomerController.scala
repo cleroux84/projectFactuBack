@@ -14,21 +14,6 @@ class CustomerController @Inject()(
                                     cc:MessagesControllerComponents,
                                     repo: CustomerRepository)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  //  val customerForm: Form[CreateCustomerForm] = Form {
-  //    mapping(
-  //      "civility" -> nonEmptyText,
-  //      "firstName" -> nonEmptyText,
-  //      "lastName" -> nonEmptyText,
-  //      "email" -> email,
-  //      "phone" -> nonEmptyText,
-  //      "phone2" -> optional(text),
-  //      "address" -> nonEmptyText,
-  //      "city" -> nonEmptyText,
-  //      "zipCode" -> nonEmptyText,
-  //      "company" -> optional(text)
-  //    )(CreateCustomerForm.apply)(CreateCustomerForm.unapply)
-  //  }
-
   def getCustomers: Action[AnyContent] = Action.async { implicit request =>
     repo.getList.map({ customers =>
       Ok(Json.toJson(customers))
