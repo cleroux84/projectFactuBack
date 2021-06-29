@@ -7,6 +7,7 @@ import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import models._
 
 /**
  * A repository for people.
@@ -15,12 +16,13 @@ import scala.concurrent.{ExecutionContext, Future}
  */
 @Singleton
 class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val customerInstance: CustomerRepository = new CustomerRepository(dbConfigProvider)
 
   import dbConfig._
   import profile.api._
 
-  private class BillTable(tag: Tag) extends Table[Bill](tag, "bill") {
+   class BillTable(tag: Tag) extends Table[Bill](tag, "bill") {
       def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
       def customerId = column[Long]("customerId")
 //      def created = column[DateTime]("created")
@@ -33,9 +35,19 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 
     def * =  (id, customerId, /*created,*/ periodCovered, billNumber, benefit, quantity, unitPrice, vatRate) <> ((Bill.apply _).tupled, Bill.unapply)
   }
-  private val bill = TableQuery[BillTable]
 
-  def getListBill: Future[Seq[Bill]] = {
-    dbConfig.db.run(bill.result)
+  val slickBill = TableQuery[BillTable]
+
+  def getListBill: Future[Seq[BillWithCustomerData]] = {
+    val query = slickBill.join(customerInstance.slickCustomer).on(_.customerId === _.id)
+//    val t: Future[Seq[(Bill, Customer)]] = db.run(query.result)
+    db.run(query.result).map { billAndCustomerSeq =>
+//      val q: Seq[(Bill, Customer)] = billAndCustomerSeq
+      billAndCustomerSeq.map { billAndCust =>
+//        val r: (Bill, Customer) = billAndCust
+        BillWithCustomerData.fromBillAndCustomerTables(billAndCust._1, billAndCust._2)
+      }
+    }
   }
+
 }
