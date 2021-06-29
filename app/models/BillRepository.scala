@@ -50,4 +50,8 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     }
   }
 
+  def deleteBill(id: Long): Future[Int] = {db.run(
+    slickBill.filter(_.id === id).delete)
+  }
+
 }

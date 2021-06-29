@@ -15,5 +15,8 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     })
   }
 
+  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
+  }
 
 }
