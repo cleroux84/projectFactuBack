@@ -34,45 +34,63 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
       def periodCovered = column[String]("periodCovered")
       def billNumber = column[String]("billNumber")
       def benefit = column[String]("benefit")
-      def quantity = column[Int]("quantity")
-      def unitPrice = column[Int]("unitPrice")
-      def vatRate = column[Int]("vatRate")
+      def quantity = column[BigDecimal]("quantity")
+      def unitPrice = column[BigDecimal]("unitPrice")
+      def vatRate = column[BigDecimal]("vatRate")
 
     def * =  (id, customerId, /*created,*/ periodCovered, billNumber, benefit, quantity, unitPrice, vatRate) <> ((Bill.apply _).tupled, Bill.unapply)
   }
 
   val slickBill = TableQuery[BillTable]
 
-  def composeBillNumber(): String = {
+  def getListBillNumber(): Future[Option[String]] = {
+    val query = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
+    db.run(query)
+  }
+
+  def composeBillNumber2(): Future[String] = {
     val date = DateTime.now().toString()
     val year = date.split("-")(0)
-    val q = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
-    val lastBillNumber = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(1)))
-    val lastBillYear = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(0)))
-    val billExist = Await.result(db.run(slickBill.result), 1.seconds)
-    billExist match {
-      case x if billExist.isEmpty =>
-        val result = year + "-" + "001"
-        result
-      case _ =>
-        val newBillYear = Await.result(lastBillYear, 1 seconds).head
-        newBillYear match {
-          case x if year == newBillYear =>
-            val newBillNumber = Await.result(lastBillNumber, 1 seconds).head.toInt + 1
-            val formatNumber = new DecimalFormat("000")
-            val result = year + "-" + formatNumber.format(newBillNumber)
-            result
-          case _ =>
-            val result = year + "-" + "001"
-            result
-        }
+
+    this.getListBillNumber().map { billNumberOpt =>
+      val lastBillNumber = billNumberOpt.map(_.split("-")(1)).getOrElse("000")
+      val lastBillYear = billNumberOpt.map(_.split("-").head).getOrElse(year)
+      val formatNumber = new DecimalFormat("000")
+
+      lastBillYear match {
+        case y if y == year => s"$y-${formatNumber.format(lastBillNumber.toInt + 1)}"
+        case _ => s"$year-001"
+      }
     }
   }
 
-  def getListBill: Future[Seq[BillWithCustomerData]] = {
+//  def composeBillNumber(): String = {
+//    val date = DateTime.now().toString()
+//    val year = date.split("-")(0)
 //    val q = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
-//    val lastBillNumber = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(1))).map(x => x.map(y => println(y)))
+//    val lastBillNumber = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(1)))
+//    val lastBillYear = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(0)))
+//    val billExist = Await.result(db.run(slickBill.result), 1.seconds)
+//    billExist match {
+//      case x if billExist.isEmpty =>
+//        val result = year + "-" + "001"
+//        result
+//      case _ =>
+//        val newBillYear = Await.result(lastBillYear, 1 seconds).head
+//        newBillYear match {
+//          case x if year == newBillYear =>
+//            val newBillNumber = Await.result(lastBillNumber, 1 seconds).head.toInt + 1
+//            val formatNumber = new DecimalFormat("000")
+//            val result = year + "-" + formatNumber.format(newBillNumber)
+//            result
+//          case _ =>
+//            val result = year + "-" + "001"
+//            result
+//        }
+//    }
+//  }
 
+  def getListBill: Future[Seq[BillWithCustomerData]] = {
     // 1
 //    db.run(q.result.headOption).map(x => println(x))
 
@@ -82,8 +100,6 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 //      println(toto)
 //      toto
 //    }
-
-
     val query = slickBill.join(customerInstance.slickCustomer).on(_.customerId === _.id)
 //    val t: Future[Seq[(Bill, Customer)]] = db.run(query.result)
     db.run(query.result).map { billAndCustomerSeq =>

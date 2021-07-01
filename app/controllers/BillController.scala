@@ -28,16 +28,16 @@ class BillController @Inject()(cc: MessagesControllerComponents,
                            periodCovered: String,
 //                           billNumber: String,
                            benefit: String,
-                           quantity: Int,
-                           unitPrice: Int,
-                           vatRate: Int
+                           quantity: BigDecimal,
+                           unitPrice: BigDecimal,
+                           vatRate: BigDecimal
                            ){
-    def toBillCustom: Bill = Bill(
+    def toBillCustom(yearNumber: String): Bill = Bill(
       id = 0L,
       customerId = this.customerId,
       periodCovered = this.periodCovered,
 //      billNumber = this.billNumber,
-      billNumber = repo.composeBillNumber(),
+      billNumber = yearNumber,
       benefit = this.benefit,
       quantity = this.quantity,
       unitPrice = this.unitPrice,
@@ -49,13 +49,38 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     implicit val reader = Json.reads[CreateBillForm]
   }
 
+//  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
+//    request.body.validate[CreateBillForm] match {
+//      case JsSuccess(createCustomerForm, _) =>
+//        repo.addBill(createCustomerForm.toBillCustom)
+//      case JsError(errors) => println(errors)
+//    }
+//    Future.successful(Ok)
+//  }
+
   def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[CreateBillForm] match {
       case JsSuccess(createCustomerForm, _) =>
-        repo.addBill(createCustomerForm.toBillCustom)
+        repo.composeBillNumber2().flatMap { number =>
+          repo.addBill(createCustomerForm.toBillCustom(number))
+        }
+//        for {
+//          number <- repo.composeBillNumber2()
+//          _ <- repo.addBill(createCustomerForm.toBillCustom(number))
+//        } yield ()
       case JsError(errors) => println(errors)
     }
     Future.successful(Ok)
   }
+
+  // Option[_] : map / flatMap
+  // Future[String] : map { string <- Accessible ici }
+  // Future[String].flatten <- NON
+  // Seq[_]
+  // Future[Option[_]] => map puis map
+  // Seq[Option[_]]] => flatMap
+  // Future[Future[_]]] => flatMap
+  // Option[Option[_]]] => flatMap
+  // Seq[Seq[_]]] => flatMap => Seq[_]
 
 }

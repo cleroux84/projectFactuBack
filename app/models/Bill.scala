@@ -12,9 +12,9 @@ case class Bill(
                  periodCovered: String,
                  billNumber: String,
                  benefit: String,
-                 quantity: Int,
-                 unitPrice: Int,
-                 vatRate: Int
+                 quantity: BigDecimal,
+                 unitPrice: BigDecimal,
+                 vatRate: BigDecimal
                    )
 
 object Bill {
@@ -30,11 +30,11 @@ case class BillWithCustomerData(
                  periodCovered: String,
                  billNumber: String,
                  benefit: String,
-                 quantity: Int,
-                 unitPrice: Int,
-                 vatRate: Int,
-                 totalHT: Int,
-                 totalTTC: Int
+                 quantity: BigDecimal,
+                 unitPrice: BigDecimal,
+                 vatRate: BigDecimal,
+                 totalHT: BigDecimal,
+                 totalTTC: BigDecimal
                ) {
 }
 

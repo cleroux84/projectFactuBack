@@ -7,9 +7,9 @@ CREATE TABLE `bill` (
                           `periodCovered` VARCHAR(255) NOT NULL,
                           `billNumber` VARCHAR(40) NOT NULL UNIQUE ,
                           `benefit` VARCHAR(255) NOT NULL,
-                          `quantity`INT(11) NOT NULL,
-                          `unitPrice`INT(40) NOT NULL,
-                          `vatRate`INT(40) NOT NULL,
+                          `quantity` DOUBLE NOT NULL,
+                          `unitPrice` DOUBLE NOT NULL,
+                          `vatRate` DOUBLE NOT NULL,
 
                           CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `customer` (`id`),
                           PRIMARY KEY (`id`)
