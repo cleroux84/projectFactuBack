@@ -6,8 +6,13 @@ import com.github.tototoshi.slick.MySQLJodaSupport._
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import models._
+
+import java.awt.Cursor
+import java.text.DecimalFormat
+import scala.concurrent.duration.DurationInt
+import scala.language.postfixOps
 
 /**
  * A repository for people.
@@ -38,13 +43,53 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 
   val slickBill = TableQuery[BillTable]
 
+  def composeBillNumber(): String = {
+    val date = DateTime.now().toString()
+    val year = date.split("-")(0)
+    val q = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
+    val lastBillNumber = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(1)))
+    val lastBillYear = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(0)))
+    val billExist = Await.result(db.run(slickBill.result), 1.seconds)
+    billExist match {
+      case x if billExist.isEmpty =>
+        val result = year + "-" + "001"
+        result
+      case _ =>
+        val newBillYear = Await.result(lastBillYear, 1 seconds).head
+        newBillYear match {
+          case x if year == newBillYear =>
+            val newBillNumber = Await.result(lastBillNumber, 1 seconds).head.toInt + 1
+            val formatNumber = new DecimalFormat("000")
+            val result = year + "-" + formatNumber.format(newBillNumber)
+            result
+          case _ =>
+            val result = year + "-" + "001"
+            result
+        }
+    }
+  }
+
   def getListBill: Future[Seq[BillWithCustomerData]] = {
+//    val q = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
+//    val lastBillNumber = db.run(q).map(lastBillOpt => lastBillOpt.map(_.split("-")(1))).map(x => x.map(y => println(y)))
+
+    // 1
+//    db.run(q.result.headOption).map(x => println(x))
+
+    // 2
+//    db.run(q.result).map { x =>
+//      val toto = x.map(_.billNumber)
+//      println(toto)
+//      toto
+//    }
+
+
     val query = slickBill.join(customerInstance.slickCustomer).on(_.customerId === _.id)
 //    val t: Future[Seq[(Bill, Customer)]] = db.run(query.result)
     db.run(query.result).map { billAndCustomerSeq =>
 //      val q: Seq[(Bill, Customer)] = billAndCustomerSeq
       billAndCustomerSeq.map { billAndCust =>
-//        val r: (Bill, Customer) = billAndCust
+        val r: (Bill, Customer) = billAndCust
         BillWithCustomerData.fromBillAndCustomerTables(billAndCust._1, billAndCust._2)
       }
     }
@@ -52,6 +97,11 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 
   def deleteBill(id: Long): Future[Int] = {db.run(
     slickBill.filter(_.id === id).delete)
+  }
+
+  def addBill(newBill: Bill): Future[String] = {
+//    println(newBill)
+    db.run(slickBill += newBill).map(res => "Bill successfully created")
   }
 
 }

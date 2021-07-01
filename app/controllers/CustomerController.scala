@@ -21,8 +21,7 @@ class CustomerController @Inject()(
   }
 
   def deleteCustomer(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    repo.deleteCustomer(id).map(_ => Redirect(routes.CustomerController.getCustomers()
-    ))
+    repo.deleteCustomer(id).map(_ => Redirect(routes.CustomerController.getCustomers()))
   }
 
   case class CreateCustomerForm(
