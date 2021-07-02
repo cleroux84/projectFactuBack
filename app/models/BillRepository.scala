@@ -9,9 +9,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import models._
 
-import java.awt.Cursor
 import java.text.DecimalFormat
-import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 
 /**
@@ -23,6 +21,7 @@ import scala.language.postfixOps
 class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val customerInstance: CustomerRepository = new CustomerRepository(dbConfigProvider)
+  val benefitInstance: BenefitRepository = new BenefitRepository(dbConfigProvider)
 
   import dbConfig._
   import profile.api._
@@ -42,13 +41,14 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   }
 
   val slickBill = TableQuery[BillTable]
+//  val slickBenefit = TableQuery[BenefitTable]
 
   def getListBillNumber(): Future[Option[String]] = {
     val query = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
     db.run(query)
   }
 
-  def composeBillNumber2(): Future[String] = {
+  def composeBillNumber(): Future[String] = {
     val date = DateTime.now().toString()
     val year = date.split("-")(0)
 
@@ -63,7 +63,7 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
       }
     }
   }
-
+//ce qye j'avais fait au depart et qui fonctionnait :
 //  def composeBillNumber(): String = {
 //    val date = DateTime.now().toString()
 //    val year = date.split("-")(0)
@@ -90,34 +90,81 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
 //    }
 //  }
 
-  def getListBill: Future[Seq[BillWithCustomerData]] = {
-    // 1
-//    db.run(q.result.headOption).map(x => println(x))
-
-    // 2
-//    db.run(q.result).map { x =>
-//      val toto = x.map(_.billNumber)
-//      println(toto)
-//      toto
+  //fait avant de creer la table benefit :
+//  def getListBill: Future[Seq[BillWithData]] = {
+//    val query = slickBill
+//      .join(customerInstance.slickCustomer).on(_.customerId === _.id)
+//      .join(benefitInstance.slickBenefit).on(_._1.id === _.billId)
+//    db.run(query.result).map { billCustomerBenefitSeq =>
+//      billCustomerBenefitSeq.map { billCustomerBenefit =>
+//        BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1._1, billCustomerBenefit._1._2, billCustomerBenefit._2)
+//      }
 //    }
-    val query = slickBill.join(customerInstance.slickCustomer).on(_.customerId === _.id)
-//    val t: Future[Seq[(Bill, Customer)]] = db.run(query.result)
-    db.run(query.result).map { billAndCustomerSeq =>
-//      val q: Seq[(Bill, Customer)] = billAndCustomerSeq
-      billAndCustomerSeq.map { billAndCust =>
-        val r: (Bill, Customer) = billAndCust
-        BillWithCustomerData.fromBillAndCustomerTables(billAndCust._1, billAndCust._2)
-      }
+//  }
+
+  def getListBenefit(bill: Bill): Future[Seq[Benefit]] = {
+    val q = benefitInstance.slickBenefit
+      .filter(_.billId ===bill.id)
+   db.run(q.result)
+  }
+
+  def getListBill: Future[Seq[BillWithData]] = {
+    val query = slickBill
+      .join(customerInstance.slickCustomer).on(_.customerId === _.id)
+
+    db.run(query.result).flatMap { billCustomerSeq =>
+      Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
+        getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
+          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitSeq)
+        }
+      })
     }
   }
+
+// Mieux pour gros db : à revoir et appliquer :
+//  def getListBill2: Future[Seq[BillWithData]] = {
+//    val query = slickBill
+//      .join(customerInstance.slickCustomer).on(_.customerId === _.id)
+//      .join(benefitInstance.slickBenefit).on(_._1.id === _.billId)
+//
+//    db.run(query.result).map { x =>
+//      val t: Seq[((Bill, Customer), Benefit)] = x
+//
+////      x.groupBy(_._1).map { seqTuple =>
+////        BillWithData.fromBillAndCustomerTables(seqTuple._1._1, seqTuple._1._2, seqTuple._2.map(_._2))
+//      x.groupBy(_._1).map { case ((bill, client), seqDuReste) =>
+//        BillWithData.fromBillAndCustomerTables(bill, client, seqDuReste.map(_._2))
+////        val p: ((Bill, Customer), Seq[((Bill, Customer), Benefit)]) = seqTuple
+//
+//        // ((Bill 1, Client1), B1)
+//        // ((Bill 1, Client1), B1)
+//        // ((Bill 2, Client1), B1)
+//        // ((Bill 2, Client1), B2)
+//
+//        // Suite au groupBy => Map
+//        //          Key                                 Values
+//        // ((Bill 1, Client1), Seq(((Bill 1, Client1), B1),  ((Bill 1, Client1), B2))
+//        // ((Bill 2, Client1), Seq(((Bill 2, Client1), B1)), ((Bill 2, Client1), B2))
+//
+//
+//      }.toSeq
+//    }
+
+//    db.run(query.result).flatMap { billCustomerSeq =>
+//      Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
+//        getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
+//          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitSeq)
+//        }
+//      })
+//    }
+//  }
+
 
   def deleteBill(id: Long): Future[Int] = {db.run(
     slickBill.filter(_.id === id).delete)
   }
 
   def addBill(newBill: Bill): Future[String] = {
-//    println(newBill)
     db.run(slickBill += newBill).map(res => "Bill successfully created")
   }
-
 }

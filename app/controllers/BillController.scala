@@ -16,17 +16,15 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     })
   }
 
-  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
-  }
+  //fonctionnait mais inutile pour les factures :
+//  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
+//    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
+//  }
 
   case class CreateBillForm(
-                           //TODO : ce que je veux recevoir du front
-//                               println(DateTime.now())
                            customerId: Long,
 //                           created: DateTime
                            periodCovered: String,
-//                           billNumber: String,
                            benefit: String,
                            quantity: BigDecimal,
                            unitPrice: BigDecimal,
@@ -36,7 +34,6 @@ class BillController @Inject()(cc: MessagesControllerComponents,
       id = 0L,
       customerId = this.customerId,
       periodCovered = this.periodCovered,
-//      billNumber = this.billNumber,
       billNumber = yearNumber,
       benefit = this.benefit,
       quantity = this.quantity,
@@ -58,29 +55,27 @@ class BillController @Inject()(cc: MessagesControllerComponents,
 //    Future.successful(Ok)
 //  }
 
-  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
-    request.body.validate[CreateBillForm] match {
-      case JsSuccess(createCustomerForm, _) =>
-        repo.composeBillNumber2().flatMap { number =>
-          repo.addBill(createCustomerForm.toBillCustom(number))
-        }
-//        for {
-//          number <- repo.composeBillNumber2()
-//          _ <- repo.addBill(createCustomerForm.toBillCustom(number))
-//        } yield ()
-      case JsError(errors) => println(errors)
-    }
-    Future.successful(Ok)
-  }
-
-  // Option[_] : map / flatMap
-  // Future[String] : map { string <- Accessible ici }
-  // Future[String].flatten <- NON
-  // Seq[_]
-  // Future[Option[_]] => map puis map
-  // Seq[Option[_]]] => flatMap
-  // Future[Future[_]]] => flatMap
-  // Option[Option[_]]] => flatMap
-  // Seq[Seq[_]]] => flatMap => Seq[_]
-
+//  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
+//    request.body.validate[CreateBillForm] match {
+//      case JsSuccess(createCustomerForm, _) =>
+//        repo.composeBillNumber().flatMap { number =>
+//          repo.addBill(createCustomerForm.toBillCustom(number))
+//        }
+////        for {
+////          number <- repo.composeBillNumber2()
+////          _ <- repo.addBill(createCustomerForm.toBillCustom(number))
+////        } yield ()
+//      case JsError(errors) => println(errors)
+//    }
+//    Future.successful(Ok)
+//  }
 }
+// Option[_] : map / flatMap
+// Future[String] : map { string <- Accessible ici }
+// Future[String].flatten <- NON
+// Seq[_]
+// Future[Option[_]] => map puis map
+// Seq[Option[_]]] => flatMap
+// Future[Future[_]]] => flatMap
+// Option[Option[_]]] => flatMap
+// Seq[Seq[_]]] => flatMap => Seq[_]

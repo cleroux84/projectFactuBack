@@ -32,9 +32,9 @@ class CustomerRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(im
 
     def * =  (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber) <> ((Customer.apply _).tupled, Customer.unapply)
   }
-  val slickCustomer = TableQuery[CustomerTable]
+  val slickCustomer: TableQuery[CustomerTable] = TableQuery[CustomerTable]
 
-  //renommer les TableQuery + separer DAO
+ //separer DAO
 
   def getList: Future[Seq[Customer]] = {
   db.run(slickCustomer.result)
