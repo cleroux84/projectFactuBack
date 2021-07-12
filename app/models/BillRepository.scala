@@ -165,6 +165,7 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   }
 
   def addBill(newBill: Bill): Future[String] = {
+    println(newBill)
     db.run(slickBill += newBill).map(res => "Bill successfully created")
   }
 }

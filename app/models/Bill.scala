@@ -11,10 +11,10 @@ case class Bill(
 //                 created: DateTime,
                  periodCovered: String,
                  billNumber: String,
-                 benefit: String,
-                 quantity: BigDecimal,
-                 unitPrice: BigDecimal,
-                 vatRate: BigDecimal
+//                 benefit: String,
+//                 quantity: BigDecimal,
+//                 unitPrice: BigDecimal,
+//                 vatRate: BigDecimal
                    )
 
 object Bill {

@@ -9,34 +9,34 @@ case class Benefit(
                   name: String,
                   quantity: BigDecimal,
                   unitPrice: BigDecimal,
-                  vatRate: BigDecimal
+                  vatRate: BigDecimal,
                   )
 
 object Benefit {
   implicit val benefitFormat: OFormat[Benefit] = Json.format[Benefit]
 }
 
-//case class BenefitWithBill(
+//case class BenefitData(
 //                          id: Long,
-//                          bill: Bill,
 //                          periodCovered: String,
 //                          name: String,
 //                          quantity: BigDecimal,
 //                          unitPrice: BigDecimal,
-//                          vatRate: BigDecimal
+//                          vatRate: BigDecimal,
+//                          totalHT: BigDecimal
 //                          )
 //
-//object BenefitWithBill {
-//  implicit val benefitWithBill: OFormat[BenefitWithBill] = Json.format[BenefitWithBill]
-//  def fromBenefitAndBillTables(benefit: Benefit, bill: Bill): BenefitWithBill = {
-//    BenefitWithBill(
+//object BenefitData {
+//  implicit val benefitData: OFormat[BenefitData] = Json.format[BenefitData]
+//  def fromTables(benefit: BenefitData): BenefitData = {
+//    BenefitData(
 //      id = benefit.id,
-//      bill = bill,
 //      periodCovered = benefit.periodCovered,
 //      name = benefit.name,
 //      quantity = benefit.quantity,
 //      unitPrice = benefit.unitPrice,
-//      vatRate = benefit.vatRate
+//      vatRate = benefit.vatRate,
+//      totalHT = benefit.unitPrice * benefit.quantity
 //    )
 //  }
 //}

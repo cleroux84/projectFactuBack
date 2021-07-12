@@ -55,20 +55,20 @@ class BillController @Inject()(cc: MessagesControllerComponents,
 //    Future.successful(Ok)
 //  }
 
-//  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
-//    request.body.validate[CreateBillForm] match {
-//      case JsSuccess(createCustomerForm, _) =>
-//        repo.composeBillNumber().flatMap { number =>
-//          repo.addBill(createCustomerForm.toBillCustom(number))
-//        }
-////        for {
-////          number <- repo.composeBillNumber2()
-////          _ <- repo.addBill(createCustomerForm.toBillCustom(number))
-////        } yield ()
-//      case JsError(errors) => println(errors)
-//    }
-//    Future.successful(Ok)
-//  }
+  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
+    request.body.validate[CreateBillForm] match {
+      case JsSuccess(createCustomerForm, _) =>
+        repo.composeBillNumber().flatMap { number =>
+          repo.addBill(createCustomerForm.toBillCustom(number))
+        }
+//        for {
+//          number <- repo.composeBillNumber2()
+//          _ <- repo.addBill(createCustomerForm.toBillCustom(number))
+//        } yield ()
+      case JsError(errors) => println(errors)
+    }
+    Future.successful(Ok)
+  }
 }
 // Option[_] : map / flatMap
 // Future[String] : map { string <- Accessible ici }
