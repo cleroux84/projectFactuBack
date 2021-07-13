@@ -22,6 +22,10 @@ class BillController @Inject()(cc: MessagesControllerComponents,
                            customerId: Long,
 //                           created: DateTime
                            periodCovered: String,
+//                           name: String,
+//                           quantity: BigDecimal,
+//                           unitPrice: BigDecimal,
+//                           quantity: BigDecimal,
                            ){
     def toBillCustom(yearNumber: String): Bill = Bill(
       id = 0L,
@@ -41,26 +45,26 @@ class BillController @Inject()(cc: MessagesControllerComponents,
   //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
   //  }
 
-//  case class CreateBenefitForm(
-////                              billId: Long,
-//                              name: String,
-//                              quantity: BigDecimal,
-//                              unitPrice: BigDecimal,
-//                              vatRate: BigDecimal
-//                              ){
-//    def toBenefitCustom(billId: Long): Benefit = Benefit(
-//      id = 0L,
-//      billId = billId,
-//      name = this.name,
-//      quantity = this.quantity,
-//      unitPrice = this.unitPrice,
-//      vatRate = this.vatRate
-//    )
-//  }
-//
-//  object CreateBenefitForm {
-//    implicit val reader = Json.reads[CreateBenefitForm]
-//  }
+  case class CreateBenefitForm(
+//                              billId: Long,
+                              name: String,
+                              quantity: BigDecimal,
+                              unitPrice: BigDecimal,
+                              vatRate: BigDecimal
+                              ){
+    def toBenefitCustom(billId: Long): Benefit = Benefit(
+      id = 0L,
+      billId = billId,
+      name = this.name,
+      quantity = this.quantity,
+      unitPrice = this.unitPrice,
+      vatRate = this.vatRate
+    )
+  }
+
+  object CreateBenefitForm {
+    implicit val reader = Json.reads[CreateBenefitForm]
+  }
 
 //  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
 //    request.body.validate[CreateBillForm] match {
@@ -75,18 +79,35 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     request.body.validate[CreateBillForm] match {
       case JsSuccess(createBillForm, _) =>
         repo.composeBillNumber().flatMap { number =>
-          repo.addBill(createBillForm.toBillCustom(number))
+          repo.addBill(createBillForm.toBillCustom(number)).flatMap { bill =>
+            request.body.validate[CreateBenefitForm] match {
+              case JsSuccess(createBenefitForm, _) =>
+
+                repoBenefit.addBenefit(createBenefitForm.toBenefitCustom(bill))
+              case JsError(errors) => Future.successful(errors)
+            }
+          }
         }
 //        for {
-//          number <- repo.composeBillNumber2()
-//          _ <- repo.addBill(createCustomerForm.toBillCustom(number))
+//          number <- repo.composeBillNumber()
+//          _ <- repo.addBill(createBillForm.toBillCustom(number)).flatMap { bill =>
+//            request.body.validate[CreateBenefitForm] match {
+//              case JsSuccess(createBenefitForm, _) =>
+//                for {
+//                  _ <- repoBenefit.addBenefit(createBenefitForm.toBenefitCustom(bill))
+//                } yield ()
+//              case JsError(errors) => Future.successful(Ok)
+//            }
+//          }
 //        } yield ()
       case JsError(errors) => println(errors)
     }
     Future.successful(Ok)
   }
-
 }
+
+
+
 // Option[_] : map / flatMap
 // Future[String] : map { string <- Accessible ici }
 // Future[String].flatten <- NON

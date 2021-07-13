@@ -82,9 +82,10 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     slickBill.filter(_.id === id).delete)
   }
 
-  def addBill(newBill: Bill): Future[String] = {
-    println(newBill)
-    db.run(slickBill += newBill).map(res => "Bill successfully created")
+  def addBill(newBill: Bill) = {
+//    println(newBill)
+    db.run(slickBill returning slickBill.map(_.id) += newBill)
+//    db.run(slickBill += newBill).map(_ => newBill)
   }
 }
 
