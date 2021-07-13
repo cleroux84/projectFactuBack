@@ -21,13 +21,12 @@ class BenefitRepository @Inject()(dbConfigProvider: DatabaseConfigProvider) (imp
   class BenefitTable(tag: Tag) extends Table[Benefit](tag, "benefit") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def billId= column[Long]("billId")
-    def periodCovered = column[String]("periodCovered")
     def name = column[String]("name")
     def quantity = column[BigDecimal]("quantity")
     def unitPrice = column[BigDecimal]("unitPrice")
     def vatRate = column[BigDecimal]("vatRate")
 
-    def * = (id, billId, periodCovered, name, quantity, unitPrice, vatRate) <> ((Benefit.apply _).tupled, Benefit.unapply)
+    def * = (id, billId, name, quantity, unitPrice, vatRate) <> ((Benefit.apply _).tupled, Benefit.unapply)
   }
 val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
 }

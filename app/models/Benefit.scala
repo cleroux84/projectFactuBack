@@ -5,7 +5,6 @@ import play.api.libs.json.{Json, OFormat}
 case class Benefit(
                   id: Long,
                   billId: Long,
-                  periodCovered: String,
                   name: String,
                   quantity: BigDecimal,
                   unitPrice: BigDecimal,
