@@ -1,7 +1,7 @@
 package models
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -49,29 +49,16 @@ val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
   }
 
   object CreateBenefitForm {
-    implicit val reader = Json.reads[CreateBenefitForm]
+    implicit val reader: Reads[CreateBenefitForm] = Json.reads[CreateBenefitForm]
   }
 
 
-  def addBenefit(benefits: Benefit) = {
+  def addBenefit(benefits: Seq[Benefit]): Future[String] = {
         println(benefits)
-//    benefits.map{benefit => db.run(slickBenefit += benefit).map(res => "Benefit success")}
-    db.run(slickBenefit += benefits).map(res => "Benefit successfully created")
-//    db.run(slickBenefit returning slickBenefit.map(_.id) ++= benefits)
+    db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
   }
 
 
-//def addBenefit(bill: Bill, benefits: Seq[Benefit]): Future[String] = {
-//  db.run(
-//  slickBenefit.returning(slickBenefit.map(_.billId)) ++= benefits.map(benefit =>
-//    Benefit(id = 0L,
-//      billId = bill.id,
-//      name = benefit.name,
-//      quantity = benefit.quantity,
-//      unitPrice = benefit.unitPrice,
-//      vatRate = benefit.vatRate)))
-////  db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
-//}
 
 }
 

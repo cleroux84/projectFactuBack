@@ -18,39 +18,11 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     })
   }
 
-  case class CreateBillForm(
-                           customerId: Long,
-//                           created: DateTime
-                           periodCovered: String,
-//                           name: String,
-//                           quantity: BigDecimal,
-//                           unitPrice: BigDecimal,
-//                           quantity: BigDecimal,
-                           ){
-    def toBillCustom(yearNumber: String): Bill = Bill(
-      id = 0L,
-      customerId = this.customerId,
-      periodCovered = this.periodCovered,
-      billNumber = yearNumber,
-    )
-  }
-
-  object CreateBillForm {
-    implicit val reader = Json.reads[CreateBillForm]
-  }
-
-
-  //fonctionnait mais inutile pour les factures :
-  //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
-  //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
-  //  }
-
   case class CreateBenefitForm(
-//                              billId: Long,
-                              name: String,
-                              quantity: BigDecimal,
-                              unitPrice: BigDecimal,
-                              vatRate: BigDecimal
+                                name: String,
+                                quantity: BigDecimal,
+                                unitPrice: BigDecimal,
+                                vatRate: BigDecimal
                               ){
     def toBenefitCustom(billId: Long): Benefit = Benefit(
       id = 0L,
@@ -66,39 +38,43 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     implicit val reader = Json.reads[CreateBenefitForm]
   }
 
-//  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
-//    request.body.validate[CreateBillForm] match {
-//      case JsSuccess(createCustomerForm, _) =>
-//        repo.addBill(createCustomerForm.toBillCustom)
-//      case JsError(errors) => println(errors)
-//    }
-//    Future.successful(Ok)
-//  }
+  case class CreateBillForm(
+                           customerId: Long,
+//                           created: DateTime
+                           periodCovered: String,
+                           benefits: Seq[CreateBenefitForm]
+                           ){
+    def toBillCustom(yearNumber: String): Bill = Bill(
+      id = 0L,
+      customerId = this.customerId,
+      periodCovered = this.periodCovered,
+      billNumber = yearNumber,
+    )
+
+  }
+
+  object CreateBillForm {
+    implicit val reader = Json.reads[CreateBillForm]
+  }
+
+
+  //fonctionnait mais inutile pour les factures :
+  //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
+  //  }
 
   def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[CreateBillForm] match {
       case JsSuccess(createBillForm, _) =>
         repo.composeBillNumber().flatMap { number =>
-          repo.addBill(createBillForm.toBillCustom(number)).flatMap { bill =>
-            request.body.validate[CreateBenefitForm] match {
-              case JsSuccess(createBenefitForm, _) =>
-
-                repoBenefit.addBenefit(createBenefitForm.toBenefitCustom(bill))
-              case JsError(errors) => Future.successful(errors)
-            }
+          repo.addBill(createBillForm.toBillCustom(number)).flatMap { billId =>
+            repoBenefit.addBenefit(createBillForm.benefits.map(_.toBenefitCustom(billId)))
           }
         }
 //        for {
 //          number <- repo.composeBillNumber()
-//          _ <- repo.addBill(createBillForm.toBillCustom(number)).flatMap { bill =>
-//            request.body.validate[CreateBenefitForm] match {
-//              case JsSuccess(createBenefitForm, _) =>
-//                for {
-//                  _ <- repoBenefit.addBenefit(createBenefitForm.toBenefitCustom(bill))
-//                } yield ()
-//              case JsError(errors) => Future.successful(Ok)
-//            }
-//          }
+//          billId <- repo.addBill(createBillForm.toBillCustom(number))
+//          _ <- repoBenefit.addBenefit(createBillForm.benefits.map(_.toBenefitCustom(billId)))
 //        } yield ()
       case JsError(errors) => println(errors)
     }

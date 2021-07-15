@@ -82,14 +82,13 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     slickBill.filter(_.id === id).delete)
   }
 
-  def addBill(newBill: Bill) = {
-//    println(newBill)
+  def addBill(newBill: Bill): Future[Long] = {
+    println(newBill)
     db.run(slickBill returning slickBill.map(_.id) += newBill)
-//    db.run(slickBill += newBill).map(_ => newBill)
   }
 }
 
-// Mieux pour gros db : à revoir et appliquer :
+// Mieux pour grosse db : à revoir et appliquer :
 //  def getListBill2: Future[Seq[BillWithData]] = {
 //    val query = slickBill
 //      .join(customerInstance.slickCustomer).on(_.customerId === _.id)
