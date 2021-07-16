@@ -57,7 +57,6 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     implicit val reader = Json.reads[CreateBillForm]
   }
 
-
   //fonctionnait mais inutile pour les factures :
   //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
   //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))

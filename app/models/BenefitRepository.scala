@@ -52,13 +52,8 @@ val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
     implicit val reader: Reads[CreateBenefitForm] = Json.reads[CreateBenefitForm]
   }
 
-
   def addBenefit(benefits: Seq[Benefit]): Future[String] = {
-        println(benefits)
     db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
   }
-
-
-
 }
 

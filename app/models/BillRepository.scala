@@ -83,7 +83,6 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   }
 
   def addBill(newBill: Bill): Future[Long] = {
-    println(newBill)
     db.run(slickBill returning slickBill.map(_.id) += newBill)
   }
 }
