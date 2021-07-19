@@ -5,7 +5,6 @@ import play.api.libs.json.{Json, Reads}
 
 object BenefitForm {
   case class CreateBenefitForm(
-                                billId: Long,
                                 name: String,
                                 quantity: BigDecimal,
                                 unitPrice: BigDecimal,

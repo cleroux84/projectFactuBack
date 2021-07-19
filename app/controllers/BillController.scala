@@ -3,6 +3,7 @@ package controllers
 import akka.http.scaladsl.model.DateTime
 import models.{BenefitRepository, Bill, BillRepository}
 import forms.BenefitForm._
+import forms.BillForm._
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
@@ -26,25 +27,6 @@ class BillController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: Mes
   val benefitInstance: BenefitRepository = new BenefitRepository(dbConfigProvider)
 
 
-  case class CreateBillForm(
-                           customerId: Long,
-//                           created: DateTime
-                           periodCovered: String,
-                           benefits: Seq[CreateBenefitForm]
-                           ){
-    def toBillCustom(yearNumber: String): Bill = Bill(
-      id = 0L,
-      customerId = this.customerId,
-      periodCovered = this.periodCovered,
-      billNumber = yearNumber,
-    )
-
-  }
-
-  object CreateBillForm {
-    implicit val reader = Json.reads[CreateBillForm]
-  }
-
   def getBills: Action[AnyContent] = Action.async { implicit request =>
     repo.getListBill.map({ billWithCustomerData =>
       Ok(Json.toJson(billWithCustomerData))
@@ -64,14 +46,17 @@ class BillController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: Mes
             repoBenefit.addBenefit(createBillForm.benefits.map(_.toBenefitCustom(billId)))
           }
         }
+        Future.successful(Ok)
 //        for {
 //          number <- repo.composeBillNumber()
 //          billId <- repo.addBill(createBillForm.toBillCustom(number))
 //          _ <- repoBenefit.addBenefit(createBillForm.benefits.map(_.toBenefitCustom(billId)))
 //        } yield ()
-      case JsError(errors) => println(errors)
+      case JsError(errors) => {
+        println(errors)
+        Future.successful(BadRequest)
+      }
     }
-    Future.successful(Ok)
   }
 }
 
