@@ -2,47 +2,34 @@ package controllers
 
 import akka.http.scaladsl.model.DateTime
 import models.{Benefit, BenefitRepository, Bill, BillRepository}
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
+import slick.jdbc.JdbcProfile
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-class BillController @Inject()(cc: MessagesControllerComponents,
+
+/**
+ * A controller for bill.
+ *
+ * @param dbConfigProvider The Play db config provider. Play will inject this for you.
+ */
+@Singleton
+class BillController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: MessagesControllerComponents,
                                repo: BillRepository, repoBenefit: BenefitRepository)(implicit ec: ExecutionContext) extends AbstractController(cc) {
-  def getBills: Action[AnyContent] = Action.async { implicit request =>
-    repo.getListBill.map({ billWithCustomerData =>
-      Ok(Json.toJson(billWithCustomerData))
-    })
-  }
+  val dbConfig = dbConfigProvider.get[JdbcProfile]
+  val benefitInstance: BenefitRepository = new BenefitRepository(dbConfigProvider)
 
-  case class CreateBenefitForm(
-                                name: String,
-                                quantity: BigDecimal,
-                                unitPrice: BigDecimal,
-                                vatRate: BigDecimal
-                              ){
-    def toBenefitCustom(billId: Long): Benefit = Benefit(
-      id = 0L,
-      billId = billId,
-      name = this.name,
-      quantity = this.quantity,
-      unitPrice = this.unitPrice,
-      vatRate = this.vatRate
-    )
-  }
-
-  object CreateBenefitForm {
-    implicit val reader = Json.reads[CreateBenefitForm]
-  }
 
   case class CreateBillForm(
                            customerId: Long,
 //                           created: DateTime
                            periodCovered: String,
-                           benefits: Seq[CreateBenefitForm]
+                           benefits: Seq[benefitInstance.CreateBenefitForm]
                            ){
     def toBillCustom(yearNumber: String): Bill = Bill(
       id = 0L,
@@ -57,7 +44,13 @@ class BillController @Inject()(cc: MessagesControllerComponents,
     implicit val reader = Json.reads[CreateBillForm]
   }
 
-  //fonctionnait mais inutile pour les factures :
+  def getBills: Action[AnyContent] = Action.async { implicit request =>
+    repo.getListBill.map({ billWithCustomerData =>
+      Ok(Json.toJson(billWithCustomerData))
+    })
+  }
+
+  //fonctionne mais inutile pour les factures :
   //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
   //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
   //  }

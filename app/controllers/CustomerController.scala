@@ -1,11 +1,9 @@
 
 package controllers
 
-import models.{Customer, CustomerRepository}
-import play.api.data.Form
-import play.api.data.Forms._
+import models. CustomerRepository
 import play.api.mvc._
-
+import forms.CustomerForm._
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
@@ -22,38 +20,6 @@ class CustomerController @Inject()(
 
   def deleteCustomer(id: Long): Action[AnyContent] = Action.async { implicit request =>
     repo.deleteCustomer(id).map(_ => Redirect(routes.CustomerController.getCustomers()))
-  }
-
-  case class CreateCustomerForm(
-                                 civility: String,
-                                 firstName: String,
-                                 lastName: String,
-                                 email: String,
-                                 phone: String,
-                                 phone2: Option[String],
-                                 address: String,
-                                 city: String,
-                                 zipCode: String,
-                                 company: Option[String],
-                                 VATNumber: String
-                               ) {
-    def toCustomerCustom: Customer = Customer (
-      id= 0L,
-      civility= this.civility,
-      firstName = this.firstName.toUpperCase(),
-      lastName = this.lastName,
-      email= this.email,
-      phone= this.phone,
-      phone2= this.phone2,
-      address= this.address,
-      city= this.city,
-      zipCode= this.zipCode,
-      company= this.company,
-      VATNumber= this.VATNumber
-    )
-  }
-  object CreateCustomerForm {
-    implicit val reader = Json.reads[CreateCustomerForm]
   }
 
   def addCustomer: Action[JsValue] = Action.async(parse.json) { implicit request =>

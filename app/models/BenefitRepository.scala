@@ -55,5 +55,10 @@ val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
   def addBenefit(benefits: Seq[Benefit]): Future[String] = {
     db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
   }
+
+  def getListBenefit(bill: Bill): Future[Seq[Benefit]] = {
+    val q = slickBenefit.filter(_.billId ===bill.id)
+    db.run(q.result)
+  }
 }
 

@@ -59,33 +59,30 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     }
   }
 
-  def getListBenefit(bill: Bill): Future[Seq[Benefit]] = {
-    val q = benefitInstance.slickBenefit
-      .filter(_.billId ===bill.id)
-   db.run(q.result)
-  }
-
   def getListBill: Future[Seq[BillWithData]] = {
     val query = slickBill
       .join(customerInstance.slickCustomer).on(_.customerId === _.id)
 
     db.run(query.result).flatMap { billCustomerSeq =>
       Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
-        getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
+        benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
           BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitSeq)
         }
       })
     }
   }
 
-  def deleteBill(id: Long): Future[Int] = {db.run(
-    slickBill.filter(_.id === id).delete)
-  }
+//  def deleteBill(id: Long): Future[Int] = {db.run(
+//    slickBill.filter(_.id === id).delete)
+//  }
 
   def addBill(newBill: Bill): Future[Long] = {
     db.run(slickBill returning slickBill.map(_.id) += newBill)
   }
 }
+
+
+
 
 // Mieux pour grosse db : à revoir et appliquer :
 //  def getListBill2: Future[Seq[BillWithData]] = {
