@@ -1,7 +1,8 @@
 package controllers
 
 import akka.http.scaladsl.model.DateTime
-import models.{Benefit, BenefitRepository, Bill, BillRepository}
+import models.{BenefitRepository, Bill, BillRepository}
+import forms.BenefitForm._
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
@@ -29,7 +30,7 @@ class BillController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: Mes
                            customerId: Long,
 //                           created: DateTime
                            periodCovered: String,
-                           benefits: Seq[benefitInstance.CreateBenefitForm]
+                           benefits: Seq[CreateBenefitForm]
                            ){
     def toBillCustom(yearNumber: String): Bill = Bill(
       id = 0L,
