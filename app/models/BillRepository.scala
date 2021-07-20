@@ -1,42 +1,23 @@
 package models
 
 import org.joda.time.DateTime
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import com.github.tototoshi.slick.MySQLJodaSupport._
 import slick.jdbc.JdbcProfile
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{Await, ExecutionContext, Future}
-import models._
+import scala.concurrent.{ExecutionContext, Future}
+import services.BillService
 
 import java.text.DecimalFormat
 import scala.language.postfixOps
 
-/**
- * A repository for bill.
- *
- * @param dbConfigProvider The Play db config provider. Play will inject this for you.
- */
 @Singleton
-class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-  val dbConfig = dbConfigProvider.get[JdbcProfile]
+class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
   val customerInstance: CustomerRepository = new CustomerRepository(dbConfigProvider)
   val benefitInstance: BenefitRepository = new BenefitRepository(dbConfigProvider)
 
-  import dbConfig._
   import profile.api._
-
-   class BillTable(tag: Tag) extends Table[Bill](tag, "bill") {
-      def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-      def customerId = column[Long]("customerId")
-//      def created = column[DateTime]("created")
-      def periodCovered = column[String]("periodCovered")
-      def billNumber = column[String]("billNumber")
-
-    def * =  (id, customerId, /*created,*/ periodCovered, billNumber) <> ((Bill.apply _).tupled, Bill.unapply)
-  }
-
-  val slickBill = TableQuery[BillTable]
 
   def getListBillNumber(): Future[Option[String]] = {
     val query = slickBill.sortBy(_.id.reverse).map(_.billNumber).result.headOption
@@ -72,14 +53,15 @@ class BillRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
     }
   }
 
-//  def deleteBill(id: Long): Future[Int] = {db.run(
-//    slickBill.filter(_.id === id).delete)
-//  }
-
   def addBill(newBill: Bill): Future[Long] = {
     println(newBill)
     db.run(slickBill returning slickBill.map(_.id) += newBill)
   }
+
+  //  def deleteBill(id: Long): Future[Int] = {db.run(
+  //    slickBill.filter(_.id === id).delete)
+  //  }
+
 }
 
 
