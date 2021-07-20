@@ -11,6 +11,7 @@ class BenefitRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
   import profile.api._
 
   def addBenefit(benefits: Seq[Benefit]): Future[String] = {
+    println(benefits)
     db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
   }
 

@@ -1,40 +1,14 @@
 package models
 import javax.inject.{Inject, Singleton}
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
-/**
- * A repository for people.
- *
- * @param dbConfigProvider The Play db config provider. Play will inject this for you.
- */
+
 @Singleton
-class CustomerRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-   val dbConfig = dbConfigProvider.get[JdbcProfile]
+class CustomerRepository @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
 
-  import dbConfig._
   import profile.api._
-
-   class CustomerTable(tag: Tag) extends Table[Customer](tag, "customer") {
-      def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-      def civility = column[String]("civility")
-      def firstName = column[String]("firstName")
-      def lastName = column[String]("lastName")
-      def email = column[String]("email")
-      def phone = column[String]("phone")
-      def phone2 = column[Option[String]]("phone2")
-      def address = column[String]("address")
-      def city = column[String]("city")
-      def zipCode = column[String]("zipCode")
-      def company = column[Option[String]]("company")
-      def VATNumber = column[String]("VATNumber")
-
-    def * =  (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber) <> ((Customer.apply _).tupled, Customer.unapply)
-  }
-  val slickCustomer: TableQuery[CustomerTable] = TableQuery[CustomerTable]
-
- //separer DAO
 
   def getList: Future[Seq[Customer]] = {
   db.run(slickCustomer.result)
