@@ -31,27 +31,6 @@ class BenefitRepository @Inject()(dbConfigProvider: DatabaseConfigProvider) (imp
   }
 val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
 
-  case class CreateBenefitForm(
-                                billId: Long,
-                                name: String,
-                                quantity: BigDecimal,
-                                unitPrice: BigDecimal,
-                                vatRate: BigDecimal
-                              ){
-    def toBenefitCustom(billId: Long): Benefit = Benefit(
-      id = 0L,
-      billId = billId,
-      name = this.name,
-      quantity = this.quantity,
-      unitPrice = this.unitPrice,
-      vatRate = this.vatRate
-    )
-  }
-
-  object CreateBenefitForm {
-    implicit val reader: Reads[CreateBenefitForm] = Json.reads[CreateBenefitForm]
-  }
-
   def addBenefit(benefits: Seq[Benefit]): Future[String] = {
     db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
   }

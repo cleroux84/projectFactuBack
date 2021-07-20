@@ -57,6 +57,7 @@ class BillController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: Mes
         Future.successful(BadRequest)
       }
     }
+//    Future.successful(Ok)
   }
 }
 
