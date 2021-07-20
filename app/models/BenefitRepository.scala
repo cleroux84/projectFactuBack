@@ -1,35 +1,14 @@
 package models
 import javax.inject.{Inject, Singleton}
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.{Json, Reads}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-/**
- * A repository for people.
- *
- * @param dbConfigProvider The Play db config provider. Play will inject this for you.
- */
 @Singleton
-class BenefitRepository @Inject()(dbConfigProvider: DatabaseConfigProvider) (implicit ec: ExecutionContext) {
-  val dbConfig = dbConfigProvider.get[JdbcProfile]
-
-  import dbConfig._
+class BenefitRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
   import profile.api._
-
-  class BenefitTable(tag: Tag) extends Table[Benefit](tag, "benefit") {
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def billId= column[Long]("billId")
-    def name = column[String]("name")
-    def quantity = column[BigDecimal]("quantity")
-    def unitPrice = column[BigDecimal]("unitPrice")
-    def vatRate = column[BigDecimal]("vatRate")
-
-    def * = (id, billId, name, quantity, unitPrice, vatRate) <> ((Benefit.apply _).tupled, Benefit.unapply)
-  }
-val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
 
   def addBenefit(benefits: Seq[Benefit]): Future[String] = {
     db.run(slickBenefit ++= benefits).map(res => "Benefit successfully created")
