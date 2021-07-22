@@ -125,9 +125,9 @@
                     <td class="tdInventory"><span>@benefit.name</span></td>
                     <td class="tdInventory"><span>@benefit.unitPrice</span></td>
                     <td class="tdInventory"><span>@benefit.quantity</span></td>
-                    <td class="tdInventory"><span> @(benefit.unitPrice * benefit.quantity)</span><span> €</span></td>
+                    <td class="tdInventory"><span> @benefit.amountHt</span><span> €</span></td>
                     <td class="tdInventory"><span> @benefit.vatRate</span><span>%</span></td>
-                    <td class="tdInventory"><span> @((benefit.unitPrice * benefit.quantity)*(1 + (benefit.vatRate/100)))</span><span> €</span></td>
+                    <td class="tdInventory"><span> @benefit.amountTtc</span><span> €</span></td>
                 </tr>
                 }
             </table>
@@ -136,15 +136,11 @@
             <table>
                 <tr>
                     <th class="thmeta"><span>Total HT </span></th>
-                    <td class="tdmeta"><span></span><span>€</span></td>
-                </tr>
-                <tr>
-                    <th class="thmeta"><span>TVA Appliquée</span></th>
-                    <td class="tdmeta"><span></span></td>
+                    <td class="tdmeta"><span>@bill.amountHt</span><span>€</span></td>
                 </tr>
                 <tr>
                     <th class="thmeta"><span>Total TTC</span></th>
-                    <td class="tdmeta"><span> </span> <span> €</span></td>
+                    <td class="tdmeta"><span>@bill.amountTtc</span> <span> €</span></td>
                 </tr>
             </table>
         </div>

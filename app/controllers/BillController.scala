@@ -2,7 +2,7 @@ package controllers
 
 import akka.http.scaladsl.model.DateTime
 import com.hhandoko.play.pdf.PdfGenerator
-import models.{BenefitRepository, Bill, BillRepository}
+import models.{Benefit, BenefitRepository, Bill, BillRepository, BillWithData}
 import forms.BenefitForm._
 import forms.BillForm._
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,6 +10,7 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
 import slick.jdbc.JdbcProfile
 import play.api.{Configuration, Environment}
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -48,9 +49,10 @@ class BillController @Inject()(
     "fonts/Roboto-ThinItalic.ttf",
   ))
 
+
   def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
-    repo.findBill(id).map { billSeq =>
-      pdfGen.ok(views.html.originalBill(billSeq.head, "etreprise@mail.com"), "http://localhost:9000") }
+    repo.findBill(id).map { billSeq: Seq[BillWithData] =>
+      pdfGen.ok(views.html.originalBill(billSeq.head, "entreprise@mail.com"), "http://localhost:9000") }
     }
 
   def getBills: Action[AnyContent] = Action.async { implicit request =>

@@ -47,7 +47,11 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     db.run(query.result).flatMap { billCustomerSeq =>
       Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
         benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
-          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitSeq)
+          val benefitWithAmount = benefitSeq.map { x => BenefitWithMount.fromBenefitToAmounts(x)}
+          val totalHT = benefitWithAmount.map(_.amountHt).sum
+          val seqHt = benefitWithAmount.map { benef => benef.amountHt * 1 + (benef.vatRate/100)}
+          val totalTtc = seqHt.sum
+          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
         }
       })
     }
@@ -60,7 +64,11 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     db.run(q.result).flatMap { x =>
       Future.sequence(x.map { billCustomerBenefit =>
         benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
-          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitSeq)
+          val benefitWithAmount = benefitSeq.map { x => BenefitWithMount.fromBenefitToAmounts(x)}
+          val totalHT = benefitWithAmount.map(_.amountHt).sum
+          val seqHt = benefitWithAmount.map { benef => benef.amountHt * 1 + (benef.vatRate/100)}
+          val totalTtc = seqHt.sum
+          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
         }
       })
     }

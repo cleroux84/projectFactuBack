@@ -15,27 +15,29 @@ object Benefit {
   implicit val benefitFormat: OFormat[Benefit] = Json.format[Benefit]
 }
 
-//case class BenefitData(
-//                          id: Long,
-//                          periodCovered: String,
-//                          name: String,
-//                          quantity: BigDecimal,
-//                          unitPrice: BigDecimal,
-//                          vatRate: BigDecimal,
-//                          totalHT: BigDecimal
-//                          )
-//
-//object BenefitData {
-//  implicit val benefitData: OFormat[BenefitData] = Json.format[BenefitData]
-//  def fromTables(benefit: BenefitData): BenefitData = {
-//    BenefitData(
-//      id = benefit.id,
-//      periodCovered = benefit.periodCovered,
-//      name = benefit.name,
-//      quantity = benefit.quantity,
-//      unitPrice = benefit.unitPrice,
-//      vatRate = benefit.vatRate,
-//      totalHT = benefit.unitPrice * benefit.quantity
-//    )
-//  }
-//}
+case class BenefitWithMount(id: Long,
+                            billId: Long,
+                            name: String,
+                            quantity: BigDecimal,
+                            unitPrice: BigDecimal,
+                            vatRate: BigDecimal,
+                            amountHt: BigDecimal,
+                            amountTtc: BigDecimal
+                           ){
+}
+
+object BenefitWithMount {
+  implicit val benefitWithMount: OFormat[BenefitWithMount] = Json.format[BenefitWithMount]
+  def fromBenefitToAmounts(benefit: Benefit): BenefitWithMount = {
+    BenefitWithMount(
+            id = benefit.id,
+            billId = benefit.billId,
+            name = benefit.name,
+            quantity = benefit.quantity,
+            unitPrice = benefit.unitPrice,
+            vatRate = benefit.vatRate,
+            amountHt = benefit.quantity * benefit.unitPrice,
+            amountTtc = (benefit.quantity * benefit.unitPrice) + (1 * (benefit.vatRate/100))
+    )
+  }
+}
