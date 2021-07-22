@@ -4,7 +4,6 @@ import org.joda.time.DateTime
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import com.github.tototoshi.slick.MySQLJodaSupport._
 import slick.jdbc.JdbcProfile
-
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import services.BillService
@@ -28,7 +27,7 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     val date = DateTime.now().toString()
     val year = date.split("-")(0)
 
-    this.getListBillNumber().map { billNumberOpt =>
+    this. getListBillNumber().map { billNumberOpt =>
       val lastBillNumber = billNumberOpt.map(_.split("-")(1)).getOrElse("000")
       val lastBillYear = billNumberOpt.map(_.split("-").head).getOrElse(year)
       val formatNumber = new DecimalFormat("000")
@@ -40,38 +39,32 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def getBillWithData(billCustomerSeq: Seq[(Bill, Customer)]): Future[Seq[BillWithData]] = {
+    Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
+      benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
+        val benefitWithAmount = benefitSeq.map { x =>
+          BenefitWithMount.fromBenefitToAmounts(x)}
+        val totalHT = benefitWithAmount.map(_.amountHt).sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+        val seqHt = benefitWithAmount.map { benef => benef.amountHt * 1 + (benef.vatRate/100)}
+        val totalTtc = seqHt.sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+        BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
+      }
+    })
+  }
+
   def getListBill: Future[Seq[BillWithData]] = {
     val query = slickBill
-      .join(customerInstance.slickCustomer).on(_.customerId === _.id)
-
+      .join(slickCustomer).on(_.customerId === _.id)
     db.run(query.result).flatMap { billCustomerSeq =>
-      Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
-        benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
-          val benefitWithAmount = benefitSeq.map { x => BenefitWithMount.fromBenefitToAmounts(x)}
-          val totalHT = benefitWithAmount.map(_.amountHt).sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-          val seqHt = benefitWithAmount.map { benef => benef.amountHt * 1 + (benef.vatRate/100)}
-          val totalTtc = seqHt.sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
-        }
-      })
+      this.getBillWithData(billCustomerSeq)
     }
   }
 
   def findBill(id: Long): Future[Seq[BillWithData]] = {
     val q = slickBill.filter(_.id === id)
       .join(slickCustomer).on(_.customerId === _.id)
-
     db.run(q.result).flatMap { x =>
-      Future.sequence(x.map { billCustomerBenefit =>
-        benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
-          val benefitWithAmount = benefitSeq.map { x => BenefitWithMount.fromBenefitToAmounts(x)}
-          val totalHT = benefitWithAmount.map(_.amountHt).sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-          val seqHt = benefitWithAmount.map { benef => benef.amountHt * 1 + (benef.vatRate/100)}
-          val totalTtc = seqHt.sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-          println(totalTtc)
-          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
-        }
-      })
+      this.getBillWithData(x)
     }
   }
 

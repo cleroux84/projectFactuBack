@@ -49,7 +49,6 @@ class BillController @Inject()(
     "fonts/Roboto-ThinItalic.ttf",
   ))
 
-
   def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
     repo.findBill(id).map { billSeq: Seq[BillWithData] =>
       pdfGen.ok(views.html.originalBill(billSeq.head, "entreprise@mail.com"), "http://localhost:9000") }
@@ -60,11 +59,6 @@ class BillController @Inject()(
       Ok(Json.toJson(billWithCustomerData))
     })
   }
-
-  //fonctionne mais inutile pour les factures :
-  //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
-  //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
-  //  }
 
   def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[CreateBillForm] match {
@@ -85,6 +79,12 @@ class BillController @Inject()(
         Future.successful(BadRequest)
       }
     }
+
+  //fonctionne mais inutile pour les factures :
+  //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  //    repo.deleteBill(id).map(_ => Redirect(routes.BillController.getBills()))
+  //  }
+
 }
 
 

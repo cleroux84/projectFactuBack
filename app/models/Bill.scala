@@ -33,7 +33,11 @@ case class BillWithData(
 
 object BillWithData {
   implicit val billWithData: OFormat[BillWithData] = Json.format[BillWithData]
-  def fromBillAndCustomerTables(bill: Bill, customer: Customer, benefit: Seq[BenefitWithMount], amountHt: BigDecimal, amountTtc: BigDecimal): BillWithData = {
+  def fromBillAndCustomerTables(bill: Bill,
+                                customer: Customer,
+                                benefit: Seq[BenefitWithMount],
+                                amountHt: BigDecimal,
+                                amountTtc: BigDecimal): BillWithData = {
     BillWithData(
       id = bill.id,
       customer = customer,
