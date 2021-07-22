@@ -53,6 +53,19 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def findBill(id: Long): Future[Seq[BillWithData]] = {
+    val q = slickBill.filter(_.id === id)
+      .join(slickCustomer).on(_.customerId === _.id)
+
+    db.run(q.result).flatMap { x =>
+      Future.sequence(x.map { billCustomerBenefit =>
+        benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
+          BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitSeq)
+        }
+      })
+    }
+  }
+
   def addBill(newBill: Bill): Future[Long] = {
     println(newBill)
     db.run(slickBill returning slickBill.map(_.id) += newBill)

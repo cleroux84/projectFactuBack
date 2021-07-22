@@ -1,0 +1,162 @@
+@(bill: BillWithData, mail: String)
+
+  <!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+      <head>
+      <meta charset="UTF-8">
+      <title>Export Facture PDF </title>
+    </head>
+  <style>
+      .roboto {
+          font-family: 'Roboto', sans-serif !important;
+          font-size: 15px;
+      }
+      .h1 { background: #000;
+          border-radius: 0.25em;
+          color: #FFF;
+          margin: 0 0 1em;
+          padding: 0.5em 0;
+      }
+      .text-center {
+          text-align: center;
+      }
+      .red-border {
+          border: 1px solid black;
+          padding: 10px;
+          text-align: center;
+          border-radius: 30px;
+      }
+      .article {
+          float: left;
+      }
+      .meta {
+          float: right;
+          width: 50%;
+          padding: 10px;
+          margin-top: 20px;
+      }
+      .thmeta {
+          background-color: #b6b3b3;
+          border-radius: 5px;
+          border: 1px solid #5e5a5a;
+          padding: 5px;
+          margin: 5px;
+          font-weight: normal;
+          width: 50%;
+      }
+      .tdmeta {
+          border: 1px solid #5e5a5a;
+          padding: 5px;
+          margin: 5px;
+          border-radius: 5px;
+          width: 60%;
+      }
+      .inventory {
+          width: 100%;
+      }
+      .thInventory {
+          background-color: #b6b3b3;
+          border-radius: 5px;
+          border: 1px solid #5e5a5a;
+          padding: 5px;
+          text-align: center;
+      }
+      .tdInventory {
+          border-radius: 5px;
+          border: 1px solid #5e5a5a;
+          padding: 5px;
+          text-align: center;
+      }
+      .footer {
+          text-align: center;
+          position: absolute;
+          bottom: -300px;
+          left: 0;
+          right: 0
+      }
+
+  </style>
+    <body class="roboto">
+      <div class="header">
+        <h1 class="text-center h1">FACTURE N° @bill.billNumber</h1>
+          <div class="red-border">
+                <h4>Mon Entreprise</h4>
+                <address>95 rue Elise Gervais, 42153 Riorges</address>
+                <address>06 99 83 93 87</address>
+                <address>@mail</address>
+          </div>
+      </div>
+      <div>
+          <div class="article">
+              <p>
+                  <span style="font-size: 125%; font-weight: bold">@bill.customer.company<br></span>
+                  <span style="font-size: 100%; font-weight: bolder">@bill.customer.civility @bill.customer.firstName  @bill.customer.lastName</span>
+              </p>
+              <address>
+                @bill.customer.address<br>
+                @bill.customer.zipCode  @bill.customer.city<br>
+                @bill.customer.email
+                @bill.customer.phone
+              </address>
+           </div>
+           <div class="meta">
+            <table>
+                <tr>
+                    <th class="thmeta"><span>Facture n° </span></th>
+                    <td class="tdmeta"><span>@bill.billNumber</span></td>
+                </tr>
+                <tr>
+                    <th class="thmeta"><span>Date</span></th>
+                    <td class="tdmeta"><span></span></td>
+                </tr>
+                <tr>
+                    <th class="thmeta"><span>Période couverte</span></th>
+                    <td class="tdmeta"><span>@bill.periodCovered</span></td>
+                </tr>
+            </table>
+           </div>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <div>
+            <table class="inventory">
+                <tr class="headerInventory">
+                    <th class="thInventory"><span>Prestation</span></th>
+                    <th class="thInventory"><span>Prix unitaire</span></th>
+                    <th class="thInventory"><span>Quantité</span></th>
+                    <th class="thInventory"><span>Montant HT</span></th>
+                    <th class="thInventory"><span>TVA appliquée</span></th>
+                    <th class="thInventory"><span>Montant TTC</span></th>
+                </tr>
+                <tr class="itemInventory">
+                    @for(benefit <- bill.benefit) {
+                    <td class="tdInventory"><span>@benefit.name</span></td>
+                    <td class="tdInventory"><span>@benefit.unitPrice</span></td>
+                    <td class="tdInventory"><span>@benefit.quantity</span></td>
+                    <td class="tdInventory"><span> @(benefit.unitPrice * benefit.quantity)</span><span> €</span></td>
+                    <td class="tdInventory"><span> @benefit.vatRate</span><span>%</span></td>
+                    <td class="tdInventory"><span> @((benefit.unitPrice * benefit.quantity)*(1 + (benefit.vatRate/100)))</span><span> €</span></td>
+                </tr>
+                }
+            </table>
+        </div>
+        <div class="meta">
+            <table>
+                <tr>
+                    <th class="thmeta"><span>Total HT </span></th>
+                    <td class="tdmeta"><span></span><span>€</span></td>
+                </tr>
+                <tr>
+                    <th class="thmeta"><span>TVA Appliquée</span></th>
+                    <td class="tdmeta"><span></span></td>
+                </tr>
+                <tr>
+                    <th class="thmeta"><span>Total TTC</span></th>
+                    <td class="tdmeta"><span> </span> <span> €</span></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <p class="footer">mentions legales</p>
+        </div>
+    </body>
+  </html>

@@ -1,6 +1,7 @@
 package controllers
 
 import akka.http.scaladsl.model.DateTime
+import com.hhandoko.play.pdf.PdfGenerator
 import models.{BenefitRepository, Bill, BillRepository}
 import forms.BenefitForm._
 import forms.BillForm._
@@ -8,7 +9,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
 import slick.jdbc.JdbcProfile
-
+import play.api.{Configuration, Environment}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -21,11 +22,36 @@ import scala.language.postfixOps
  * @param dbConfigProvider The Play db config provider. Play will inject this for you.
  */
 @Singleton
-class BillController @Inject()(dbConfigProvider: DatabaseConfigProvider, cc: MessagesControllerComponents,
-                               repo: BillRepository, repoBenefit: BenefitRepository)(implicit ec: ExecutionContext) extends AbstractController(cc) {
+class BillController @Inject()(
+                               dbConfigProvider: DatabaseConfigProvider,
+                               cc: MessagesControllerComponents,
+                               repo: BillRepository,
+                               repoBenefit: BenefitRepository,
+                               env: Environment,
+                              )
+                              (implicit ec: ExecutionContext) extends AbstractController(cc) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
   val benefitInstance: BenefitRepository = new BenefitRepository(dbConfigProvider)
+  val pdfGen = new PdfGenerator(env)
+  pdfGen.loadLocalFonts(Seq(
+    "fonts/Roboto-Black.ttf",
+    "fonts/Roboto-BlackItalic.ttf",
+    "fonts/Roboto-Bold.ttf",
+    "fonts/Roboto-BoldItalic.ttf",
+    "fonts/Roboto-Italic.ttf",
+    "fonts/Roboto-Light.ttf",
+    "fonts/Roboto-LightItalic.ttf",
+    "fonts/Roboto-Medium.ttf",
+    "fonts/Roboto-MediumItalic.ttf",
+    "fonts/Roboto-Regular.ttf",
+    "fonts/Roboto-Thin.ttf",
+    "fonts/Roboto-ThinItalic.ttf",
+  ))
 
+  def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
+    repo.findBill(id).map { billSeq =>
+      pdfGen.ok(views.html.originalBill(billSeq.head, "cleroux84@gmail.com"), "http://localhost:9000") }
+    }
 
   def getBills: Action[AnyContent] = Action.async { implicit request =>
     repo.getListBill.map({ billWithCustomerData =>
