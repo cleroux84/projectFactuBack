@@ -31,7 +31,7 @@ class BillController @Inject()(
                               )
                               (implicit ec: ExecutionContext) extends AbstractController(cc) {
   val dbConfig = dbConfigProvider.get[JdbcProfile]
-  val benefitInstance: BenefitRepository = new BenefitRepository(dbConfigProvider)
+
   val pdfGen = new PdfGenerator(env)
   pdfGen.loadLocalFonts(Seq(
     "fonts/Roboto-Black.ttf",
@@ -50,7 +50,7 @@ class BillController @Inject()(
 
   def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
     repo.findBill(id).map { billSeq =>
-      pdfGen.ok(views.html.originalBill(billSeq.head, "cleroux84@gmail.com"), "http://localhost:9000") }
+      pdfGen.ok(views.html.originalBill(billSeq.head, "etreprise@mail.com"), "http://localhost:9000") }
     }
 
   def getBills: Action[AnyContent] = Action.async { implicit request =>
@@ -78,13 +78,11 @@ class BillController @Inject()(
 //          billId <- repo.addBill(createBillForm.toBillCustom(number))
 //          _ <- repoBenefit.addBenefit(createBillForm.benefits.map(_.toBenefitCustom(billId)))
 //        } yield ()
-      case JsError(errors) => {
+      case JsError(errors) =>
         println(errors)
         Future.successful(BadRequest)
       }
     }
-//    Future.successful(Ok)
-  }
 }
 
 
