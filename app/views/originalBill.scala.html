@@ -1,3 +1,5 @@
+@import java.text.SimpleDateFormat
+@import java.util.Date
 @(bill: BillWithData, mail: String)
 
   <!DOCTYPE html>
@@ -100,7 +102,7 @@
                 </tr>
                 <tr>
                     <th class="thmeta"><span>Date</span></th>
-                    <td class="tdmeta"><span></span></td>
+                    <td class="tdmeta"><span>@(new SimpleDateFormat("dd-MM-yyyy").format(bill.created.toDate))</span></td>
                 </tr>
                 <tr>
                     <th class="thmeta"><span>Période couverte</span></th>

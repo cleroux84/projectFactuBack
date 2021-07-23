@@ -2,12 +2,13 @@ package forms
 
 import forms.BenefitForm.CreateBenefitForm
 import models.Bill
-import play.api.libs.json.Json
+import org.joda.time.DateTime
+import play.api.libs.json.{JodaReads, JodaWrites, Json, Reads, Writes}
 
 object BillForm {
   case class CreateBillForm(
                              customerId: Long,
-//                           created: DateTime
+                             created: DateTime,
                              periodCovered: String,
                              benefits: Seq[CreateBenefitForm]
                            ){
@@ -16,12 +17,15 @@ object BillForm {
       customerId = this.customerId,
       periodCovered = this.periodCovered,
       billNumber = yearNumber,
+      created = this.created
     )
 
   }
 
   object CreateBillForm {
-    implicit val reader = Json.reads[CreateBillForm]
+    implicit val jodaWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
+    implicit val jodaReads: Reads[DateTime] = JodaReads.JodaDateReads
+    implicit val reader: Reads[CreateBillForm] = Json.reads[CreateBillForm]
   }
 
 }

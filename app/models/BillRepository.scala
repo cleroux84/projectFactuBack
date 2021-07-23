@@ -7,7 +7,6 @@ import slick.jdbc.JdbcProfile
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import services.BillService
-
 import java.text.DecimalFormat
 import scala.language.postfixOps
 

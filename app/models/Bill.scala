@@ -1,28 +1,31 @@
 package models
 
-
 import org.joda.time.DateTime
-import play.api.libs.json.{Json, OFormat, OWrites, Writes}
+import play.api.libs.json.{JodaReads, JodaWrites, Json, OFormat, Reads, Writes}
+
 
 
 case class Bill(
                  id: Long,
                  customerId: Long,
-//                 created: DateTime,
+                 created: DateTime,
                  periodCovered: String,
                  billNumber: String,
                )
 
 object Bill {
-//  implicit val jodaWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("yyyy-MM-dd")
+  implicit val jodaWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("dd-MM-yyyy")
+  implicit val jodaReads: Reads[DateTime] = JodaReads.JodaDateReads
   implicit val billFormat: OFormat[Bill] = Json.format[Bill]
+//  implicit val billWrites = Json.reads[Bill]
+//  implicit val billReads = Json.writes[Bill]
 
 }
 
 case class BillWithData(
                  id: Long,
                  customer: Customer,
-                 //                 created: DateTime,
+                 created: DateTime,
                  periodCovered: String,
                  billNumber: String,
                  benefit: Seq[BenefitWithMount],
@@ -32,6 +35,8 @@ case class BillWithData(
 }
 
 object BillWithData {
+  implicit val jodaWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("dd-MM-yyyy")
+  implicit val jodaReads: Reads[DateTime] = JodaReads.JodaDateReads
   implicit val billWithData: OFormat[BillWithData] = Json.format[BillWithData]
   def fromBillAndCustomerTables(bill: Bill,
                                 customer: Customer,
@@ -43,6 +48,7 @@ object BillWithData {
       customer = customer,
       periodCovered = bill.periodCovered.toLowerCase.capitalize,
       billNumber = bill.billNumber,
+      created = bill.created,
       benefit = benefit,
       amountHt = amountHt,
       amountTtc = amountTtc
