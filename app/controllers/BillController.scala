@@ -75,6 +75,7 @@ class BillController @Inject()(
 //          _ <- repoBenefit.addBenefit(createBillForm.benefits.map(_.toBenefitCustom(billId)))
 //        } yield ()
       case JsError(errors) =>
+        println("error billController")
         println(errors)
         Future.successful(BadRequest)
       }

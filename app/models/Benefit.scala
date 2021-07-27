@@ -37,7 +37,7 @@ object BenefitWithMount {
             unitPrice = benefit.unitPrice,
             vatRate = benefit.vatRate,
             amountHt = (benefit.quantity * benefit.unitPrice).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble,
-            amountTtc = (benefit.quantity * benefit.unitPrice) + (1 * (benefit.vatRate/100)).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+            amountTtc = (benefit.quantity * benefit.unitPrice) * (1 + (benefit.vatRate/100)).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
     )
   }
 }
