@@ -1,7 +1,7 @@
 package services
 
 import com.github.tototoshi.slick.MySQLJodaSupport._
-import models.{Benefit, Bill, Customer}
+import models.{Bank, Benefit, Bill, Customer}
 import org.joda.time.DateTime
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -13,6 +13,7 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
   val slickBill: TableQuery[BillTable] = TableQuery[BillTable]
   val slickCustomer: TableQuery[CustomerTable] = TableQuery[CustomerTable]
   val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
+  val slickBank: TableQuery[BankTable] = TableQuery[BankTable]
 
   class CustomerTable(tag: Tag) extends Table[Customer](tag, "customer") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
@@ -27,8 +28,9 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def zipCode = column[String]("zipCode")
     def company = column[Option[String]]("company")
     def VATNumber = column[String]("VATNumber")
+    def bankId = column[Long]("bankId")
 
-    def * = (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber) <> ((Customer.apply _).tupled, Customer.unapply)
+    def * = (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber, bankId) <> ((Customer.apply _).tupled, Customer.unapply)
   }
 
   class BillTable(tag: Tag) extends Table[Bill](tag, "bill") {
@@ -50,6 +52,19 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def vatRate = column[BigDecimal]("vatRate")
 
     def * = (id, billId, name, quantity, unitPrice, vatRate) <> ((Benefit.apply _).tupled, Benefit.unapply)
+  }
+
+  class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
+    def id= column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def customerId = column[Long]("customerId")
+    def name = column[String]("name")
+    def bankCode = column[String]("bankCode")
+    def guichetCode = column[String]("guichetCode")
+    def account = column[String]("account")
+    def ribKey = column[BigDecimal]("ribKey")
+    def iban = column[String]("iban")
+
+    def * = (id, customerId, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
   }
 
 }

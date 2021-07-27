@@ -17,7 +17,8 @@ case class Customer(
                      city: String,
                      zipCode: String,
                      company: Option[String],
-                     VATNumber: String
+                     VATNumber: String,
+                     bankId: Long
                    )
 object Customer {
   implicit val customerFormat = Json.format[Customer]
