@@ -13,9 +13,6 @@ CREATE TABLE `bank` (
                         PRIMARY KEY (`id`)
 );
 
-ALTER TABLE `customer` ADD COLUMN `bankId` VARCHAR(40);
-ALTER TABLE `customer` ADD CONSTRAINT FOREIGN KEY (`bankId`) REFERENCES `bank` (`id`);
-
 -- !Downs
 DROP TABLE `bank`
 
