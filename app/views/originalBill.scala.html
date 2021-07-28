@@ -1,6 +1,6 @@
 @import java.text.SimpleDateFormat
 @import java.util.Date
-@(bill: BillWithData, user: User)
+@(bill: BillWithData, user: UserWithBank)
 
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
@@ -75,11 +75,11 @@
         <div class="header">
             <h1 class="text-center h1">FACTURE</h1>
             <div class="red-border">
-                <h5>@user.civility @user.firstName @user.lastName</h5>
-                <h5>Siret : @user.siret</h5>
-                <address>@user.address, @user.zipCode @user.city</address>
-                <address>@user.phone</address>
-                <address>@user.email</address>
+                <h5>@user.user.civility @user.user.firstName @user.user.lastName</h5>
+                <h5>Siret : @user.user.siret</h5>
+                <address>@user.user.address, @user.user.zipCode @user.user.city</address>
+                <address>@user.user.phone</address>
+                <address>@user.user.email</address>
             </div>
         </div>
         <div>
@@ -95,7 +95,7 @@
                     @bill.customer.phone
                 </address>
             </div>
-            <div class="meta">
+            <div class="article meta">
                 <table>
                     <tr>
                         <th class="thmeta"><span>Facture n° </span></th>
@@ -112,8 +112,8 @@
                 </table>
             </div>
         </div>
-        <br><br><br><br><br><br><br><br><br><br><br>
-        <div>
+@*        <br><br><br><br><br><br><br><br><br><br><br>*@
+        <div class="article">
             <table class="inventory">
                 <tr class="headerInventory">
                     <th class="thInventory"><span>Prestation</span></th>
@@ -135,7 +135,7 @@
                 }
             </table>
         </div>
-        <div class="meta">
+        <div class="article meta">
             <table>
                 <tr>
                     <th class="thmeta"><span>Total HT </span></th>
@@ -148,8 +148,11 @@
             </table>
         </div>
         <br><br><br><br><br><br><br><br><br><br><br>
+
         <div>
-            <p style="text-align: center">- mentions légales -</p>
+            <span>Nom de la banque : @user.bank.name</span>
+            <span>IBAN : @user.bank.iban</span>
         </div>
+
     </body>
 </html>

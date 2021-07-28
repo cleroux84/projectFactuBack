@@ -21,6 +21,7 @@ class UserController @Inject()(
 
   def getCurrentUser(id: Long): Action[AnyContent] = Action.async { implicit req =>
     repo.getUser(id).map({ user =>
+      println(user)
       Ok(Json.toJson(user))})
   }
 

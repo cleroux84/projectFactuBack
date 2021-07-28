@@ -1,7 +1,7 @@
 package services
 
 import com.github.tototoshi.slick.MySQLJodaSupport._
-import models.{Benefit, Bill, Customer, User}
+import models.{Bank, Benefit, Bill, Customer, User}
 import org.joda.time.DateTime
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -14,7 +14,7 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
   val slickCustomer: TableQuery[CustomerTable] = TableQuery[CustomerTable]
   val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
   val slickUser: TableQuery[UserTable] = TableQuery[UserTable]
-//  val slickBank: TableQuery[BankTable] = TableQuery[BankTable]
+  val slickBank: TableQuery[BankTable] = TableQuery[BankTable]
 
   class UserTable(tag: Tag) extends Table[User](tag, "user") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
@@ -71,17 +71,16 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def * = (id, billId, name, quantity, unitPrice, vatRate) <> ((Benefit.apply _).tupled, Benefit.unapply)
   }
 
-//  class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
-//    def id= column[Long]("id", O.PrimaryKey, O.AutoInc)
-//    def customerId = column[Long]("customerId")
-//    def name = column[String]("name")
-//    def bankCode = column[String]("bankCode")
-//    def guichetCode = column[String]("guichetCode")
-//    def account = column[String]("account")
-//    def ribKey = column[BigDecimal]("ribKey")
-//    def iban = column[String]("iban")
-//
-//    def * = (id, customerId, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
-//  }
+  class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
+    def id= column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def name = column[String]("name")
+    def bankCode = column[String]("bankCode")
+    def guichetCode = column[String]("guichetCode")
+    def account = column[String]("account")
+    def ribKey = column[BigDecimal]("ribKey")
+    def iban = column[String]("iban")
+
+    def * = (id, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
+  }
 
 }
