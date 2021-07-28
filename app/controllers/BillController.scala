@@ -2,7 +2,7 @@ package controllers
 
 import akka.http.scaladsl.model.DateTime
 import com.hhandoko.play.pdf.PdfGenerator
-import models.{Benefit, BenefitRepository, Bill, BillRepository, BillWithData}
+import models.{Benefit, BenefitRepository, Bill, BillRepository, BillWithData, User, UserRepository}
 import forms.BenefitForm._
 import forms.BillForm._
 import play.api.db.slick.DatabaseConfigProvider
@@ -17,21 +17,15 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
 
-/**
- * A controller for bill.
- *
- * @param dbConfigProvider The Play db config provider. Play will inject this for you.
- */
 @Singleton
 class BillController @Inject()(
-                               dbConfigProvider: DatabaseConfigProvider,
                                cc: MessagesControllerComponents,
                                repo: BillRepository,
                                repoBenefit: BenefitRepository,
+                               repoUser: UserRepository,
                                env: Environment,
                               )
                               (implicit ec: ExecutionContext) extends AbstractController(cc) {
-  val dbConfig = dbConfigProvider.get[JdbcProfile]
 
   val pdfGen = new PdfGenerator(env)
   pdfGen.loadLocalFonts(Seq(
@@ -49,10 +43,18 @@ class BillController @Inject()(
     "fonts/Roboto-ThinItalic.ttf",
   ))
 
-  def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
+//  def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
+//    repo.findBill(id).map { billSeq: Seq[BillWithData] =>
+//      pdfGen.ok(views.html.originalBill(billSeq.head/*, user*/), "http://localhost:9000") }
+//    }
+
+  def exportBillPdf(id: Long/*, userId: Long*/): Action[AnyContent] = Action.async { implicit r =>
     repo.findBill(id).map { billSeq: Seq[BillWithData] =>
-      pdfGen.ok(views.html.originalBill(billSeq.head, "entreprise@mail.com"), "http://localhost:9000") }
-    }
+      repoUser.getUser(1).map { user =>
+        pdfGen.ok(views.html.originalBill(billSeq.head, user), "http://localhost:9000")
+      }
+    }.flatten
+  }
 
   def getBills: Action[AnyContent] = Action.async { implicit request =>
     repo.getListBill.map({ billWithCustomerData =>

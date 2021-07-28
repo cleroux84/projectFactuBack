@@ -1,6 +1,6 @@
 package models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, OFormat}
 import play.api.mvc.PathBindable
 import slick.lifted.MappedTo
 
@@ -18,8 +18,7 @@ case class Customer(
                      zipCode: String,
                      company: Option[String],
                      VATNumber: String,
-                     bankId: Long
                    )
 object Customer {
-  implicit val customerFormat = Json.format[Customer]
+  implicit val customerFormat: OFormat[Customer] = Json.format[Customer]
 }

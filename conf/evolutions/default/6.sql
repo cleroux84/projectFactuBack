@@ -1,18 +1,20 @@
 # --- !Ups
-CREATE TABLE `bank` (
-                        `id` BIGINT NOT NULL AUTO_INCREMENT,
-                        `customerId` BIGINT(20) NOT NULL,
-                        `name` VARCHAR(255) NOT NULL,
-                        `bankCode` VARCHAR(40) NOT NULL,
-                        `guichetCode` VARCHAR(40) NOT NULL,
-                        `account` VARCHAR(40) NOT NULL,
-                        `ribKey` DOUBLE NOT NULL,
-                        `iban` VARCHAR(40) NOT NULL,
 
-                        CONSTRAINT FOREIGN KEY (`customerId`) REFERENCES `customer` (`id`),
+CREATE TABLE `user` (
+                        `id` BIGINT NOT NULL AUTO_INCREMENT,
+                        `civility` VARCHAR(255) NOT NULL,
+                        `firstName` VARCHAR(255) NOT NULL,
+                        `lastName` VARCHAR(255) NOT NULL,
+                        `email` VARCHAR(255) NOT NULL,
+                        `phone` VARCHAR(255) NOT NULL,
+                        `address` VARCHAR(255) NOT NULL,
+                        `city` VARCHAR(255) NOT NULL,
+                        `zipCode` VARCHAR(255) NOT NULL,
+                        `siret` VARCHAR(255) NOT NULL,
+                        `bankId` BIGINT(20) NOT NULL,
                         PRIMARY KEY (`id`)
 );
 
 -- !Downs
-DROP TABLE `bank`
 
+DROP TABLE `user`

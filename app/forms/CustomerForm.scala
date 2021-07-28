@@ -17,7 +17,7 @@ object CustomerForm {
                           city: String,
                           zipCode: String,
                           company: Option[String],
-                          VATNumber: String
+                          VATNumber: String,
                          ){
     def toCustomerCustom: Customer = Customer(
       id = 0L,

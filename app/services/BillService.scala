@@ -1,7 +1,7 @@
 package services
 
 import com.github.tototoshi.slick.MySQLJodaSupport._
-import models.{Bank, Benefit, Bill, Customer}
+import models.{Benefit, Bill, Customer, User}
 import org.joda.time.DateTime
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -13,7 +13,25 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
   val slickBill: TableQuery[BillTable] = TableQuery[BillTable]
   val slickCustomer: TableQuery[CustomerTable] = TableQuery[CustomerTable]
   val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
-  val slickBank: TableQuery[BankTable] = TableQuery[BankTable]
+  val slickUser: TableQuery[UserTable] = TableQuery[UserTable]
+//  val slickBank: TableQuery[BankTable] = TableQuery[BankTable]
+
+  class UserTable(tag: Tag) extends Table[User](tag, "user") {
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def civility = column[String]("civility")
+    def firstName = column[String]("firstName")
+    def lastName = column[String]("lastName")
+    def email = column[String]("email")
+    def phone = column[String]("phone")
+    def address = column[String]("address")
+    def city = column[String]("city")
+    def zipCode = column[String]("zipCode")
+    def siret = column[String]("siret")
+    def bankId = column[Long]("bankId")
+
+    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId) <> ((User.apply _).tupled, User.unapply)
+
+  }
 
   class CustomerTable(tag: Tag) extends Table[Customer](tag, "customer") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
@@ -28,9 +46,8 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def zipCode = column[String]("zipCode")
     def company = column[Option[String]]("company")
     def VATNumber = column[String]("VATNumber")
-    def bankId = column[Long]("bankId")
 
-    def * = (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber, bankId) <> ((Customer.apply _).tupled, Customer.unapply)
+    def * = (id, civility, firstName, lastName, email, phone, phone2, address, city, zipCode, company, VATNumber) <> ((Customer.apply _).tupled, Customer.unapply)
   }
 
   class BillTable(tag: Tag) extends Table[Bill](tag, "bill") {
@@ -54,17 +71,17 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def * = (id, billId, name, quantity, unitPrice, vatRate) <> ((Benefit.apply _).tupled, Benefit.unapply)
   }
 
-  class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
-    def id= column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def customerId = column[Long]("customerId")
-    def name = column[String]("name")
-    def bankCode = column[String]("bankCode")
-    def guichetCode = column[String]("guichetCode")
-    def account = column[String]("account")
-    def ribKey = column[BigDecimal]("ribKey")
-    def iban = column[String]("iban")
-
-    def * = (id, customerId, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
-  }
+//  class BankTable(tag: Tag) extends Table[Bank](tag, "bank") {
+//    def id= column[Long]("id", O.PrimaryKey, O.AutoInc)
+//    def customerId = column[Long]("customerId")
+//    def name = column[String]("name")
+//    def bankCode = column[String]("bankCode")
+//    def guichetCode = column[String]("guichetCode")
+//    def account = column[String]("account")
+//    def ribKey = column[BigDecimal]("ribKey")
+//    def iban = column[String]("iban")
+//
+//    def * = (id, customerId, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
+//  }
 
 }

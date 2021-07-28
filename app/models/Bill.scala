@@ -30,7 +30,7 @@ case class BillWithData(
                  billNumber: String,
                  benefit: Seq[BenefitWithMount],
                  amountHt: BigDecimal,
-                 amountTtc: BigDecimal
+                 amountTtc: BigDecimal,
                ) {
 }
 
@@ -42,7 +42,8 @@ object BillWithData {
                                 customer: Customer,
                                 benefit: Seq[BenefitWithMount],
                                 amountHt: BigDecimal,
-                                amountTtc: BigDecimal): BillWithData = {
+                                amountTtc: BigDecimal,
+                               ): BillWithData = {
     BillWithData(
       id = bill.id,
       customer = customer,
@@ -51,7 +52,7 @@ object BillWithData {
       created = bill.created,
       benefit = benefit,
       amountHt = amountHt,
-      amountTtc = amountTtc
+      amountTtc = amountTtc,
     )
   }
 }
