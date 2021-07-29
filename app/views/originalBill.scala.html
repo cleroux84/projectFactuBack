@@ -13,7 +13,8 @@
                 font-family: 'Roboto', sans-serif !important;
                 font-size: 15px;
             }
-            .h1 { background: #000;
+            .h1 {
+                background: #000;
                 border-radius: 0.25em;
                 color: #FFF;
                 margin: 0 0 1em;
@@ -53,9 +54,16 @@
                 border-radius: 5px;
                 width: 60%;
             }
-            .inventory {
-                width: 100%;
+            .customerDiv{
+                margin-left: 50px;
+                width: 50%;
             }
+            .inventory {
+                width: 120%;
+                margin-top: 25px;
+                margin-left: 10px;
+            }
+
             .thInventory {
                 background-color: #b6b3b3;
                 border-radius: 5px;
@@ -69,6 +77,12 @@
                 padding: 5px;
                 text-align: center;
             }
+            .footer {
+                /*margin-left: 300px;*/
+                margin-top: 150px;
+                width: 100%;
+                text-align: center;
+            }
 
     </style>
     <body class="roboto">
@@ -76,26 +90,26 @@
             <h1 class="text-center h1">FACTURE</h1>
             <div class="red-border">
                 <h5>@user.user.civility @user.user.firstName @user.user.lastName</h5>
-                <h5>Siret : @user.user.siret</h5>
                 <address>@user.user.address, @user.user.zipCode @user.user.city</address>
                 <address>@user.user.phone</address>
                 <address>@user.user.email</address>
+                <h6>N° Siret : @user.user.siret</h6>
             </div>
         </div>
-        <div>
-            <div class="article">
+        <div class="">
+            <div class="article customerDiv">
                 <p>
                     <span style="font-size: 125%; font-weight: bold">@bill.customer.company<br></span>
                     <span style="font-size: 100%; font-weight: bolder">@bill.customer.civility @bill.customer.firstName  @bill.customer.lastName</span>
                 </p>
-                <address>
+                <p>
                     @bill.customer.address<br>
-                    @bill.customer.zipCode  @bill.customer.city<br>
-                    @bill.customer.email
-                    @bill.customer.phone
-                </address>
+                    @bill.customer.zipCode  @bill.customer.city
+                </p>
+                    <address style="font-size: 80%">@bill.customer.email <br>  @bill.customer.phone</address>
+
             </div>
-            <div class="article meta">
+            <div class="article meta numberDiv">
                 <table>
                     <tr>
                         <th class="thmeta"><span>Facture n° </span></th>
@@ -112,8 +126,7 @@
                 </table>
             </div>
         </div>
-@*        <br><br><br><br><br><br><br><br><br><br><br>*@
-        <div class="article">
+        <div class="article inventoryDiv">
             <table class="inventory">
                 <tr class="headerInventory">
                     <th class="thInventory"><span>Prestation</span></th>
@@ -135,7 +148,7 @@
                 }
             </table>
         </div>
-        <div class="article meta">
+        <div class="meta">
             <table>
                 <tr>
                     <th class="thmeta"><span>Total HT </span></th>
@@ -147,12 +160,13 @@
                 </tr>
             </table>
         </div>
-        <br><br><br><br><br><br><br><br><br><br><br>
 
-        <div>
-            <span>Nom de la banque : @user.bank.name</span>
-            <span>IBAN : @user.bank.iban</span>
+        <div class="article footer">
+            <h3>Conditions et modalités de paiement</h3>
+            <span>Facture payable</span><span style="font-weight: bolder"> sous 15 jours, </span><span>soit le : @(new SimpleDateFormat("dd-MM-yyyy").format(bill.invoiceDueBy.toDate))</span><br>
+            <br>
+            <span style="font-weight: bold">@user.bank.name</span><br>
+            <span style="font-weight: bold">IBAN : @user.bank.iban</span>
         </div>
-
     </body>
 </html>

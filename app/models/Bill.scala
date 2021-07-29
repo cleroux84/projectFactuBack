@@ -31,6 +31,7 @@ case class BillWithData(
                  benefit: Seq[BenefitWithMount],
                  amountHt: BigDecimal,
                  amountTtc: BigDecimal,
+                 invoiceDueBy: DateTime
                ) {
 }
 
@@ -53,6 +54,7 @@ object BillWithData {
       benefit = benefit,
       amountHt = amountHt,
       amountTtc = amountTtc,
+      invoiceDueBy = (bill.created).plusDays(15)
     )
   }
 }

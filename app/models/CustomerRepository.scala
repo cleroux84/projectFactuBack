@@ -20,7 +20,22 @@ class CustomerRepository @Inject() (protected val dbConfigProvider: DatabaseConf
   }
 
   def addCustomer(newCustomer: Customer): Future[String] = {
-    db.run(slickCustomer += newCustomer).map(res => "Customer successfully created")
+    val phone = (newCustomer.phone).filter(Character.isDigit).replaceAll("..(?!$)", "$0 ")
+    val phone2 = Option((newCustomer.phone2).getOrElse("").filter(Character.isDigit).replaceAll("..(?!$)", "$0 "))
+    db.run(slickCustomer += Customer(
+      id = newCustomer.id,
+      civility = newCustomer.civility,
+      firstName = newCustomer.firstName.split(' ').map(_.capitalize).mkString(" "),
+      lastName = newCustomer.lastName.split(' ').map(_.capitalize).mkString(" "),
+      email = newCustomer.email,
+      phone = phone,
+      phone2 = phone2,
+      address = newCustomer.address,
+      city = newCustomer.city,
+      zipCode = newCustomer.zipCode,
+      company = Option(newCustomer.company.getOrElse("").split(' ').map(_.capitalize).mkString(" ")),
+      VATNumber = /*"FR " + */newCustomer.VATNumber
+    )).map(res => "Customer successfully created")
     }
 
   def updateCustomer(id: Long, civility: String, firstName: String, lastName: String, email: String, phone: String, phone2: Option[String], company: Option[String], address: String, city: String, zipCode: String, VATNumber: String): Future[Int] = {
