@@ -139,11 +139,11 @@
                 <tr class="itemInventory">
                 @for(benefit <- bill.benefit) {
                     <td class="tdInventory"><span>@benefit.name</span></td>
-                    <td class="tdInventory"><span>@benefit.unitPrice</span></td>
+                    <td class="tdInventory"><span>@benefit.unitPrice.setScale(2, BigDecimal.RoundingMode.HALF_UP)</span></td>
                     <td class="tdInventory"><span>@benefit.quantity</span></td>
-                    <td class="tdInventory"><span> @benefit.amountHt</span><span> €</span></td>
+                    <td class="tdInventory"><span> @benefit.amountHt.setScale(2, BigDecimal.RoundingMode.HALF_UP)</span><span> €</span></td>
                     <td class="tdInventory"><span> @benefit.vatRate</span><span>%</span></td>
-                    <td class="tdInventory"><span> @benefit.amountTtc</span><span> €</span></td>
+                    <td class="tdInventory"><span> @benefit.amountTtc.setScale(2, BigDecimal.RoundingMode.HALF_UP)</span><span> €</span></td>
                 </tr>
                 }
             </table>
@@ -152,11 +152,11 @@
             <table>
                 <tr>
                     <th class="thmeta"><span>Total HT </span></th>
-                    <td class="tdmeta"><span>@bill.amountHt</span><span>€</span></td>
+                    <td class="tdmeta"><span>@bill.amountHt.setScale(2, BigDecimal.RoundingMode.HALF_UP)</span><span>€</span></td>
                 </tr>
                 <tr>
                     <th class="thmeta"><span>Total TTC</span></th>
-                    <td class="tdmeta"><span>@bill.amountTtc</span> <span> €</span></td>
+                    <td class="tdmeta"><span>@bill.amountTtc.setScale(2, BigDecimal.RoundingMode.HALF_UP)</span> <span> €</span></td>
                 </tr>
             </table>
         </div>
