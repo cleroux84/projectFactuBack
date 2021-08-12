@@ -1,6 +1,7 @@
 package controllers
 
 import akka.http.scaladsl.model.DateTime
+import auth.AuthAction
 import com.hhandoko.play.pdf.PdfGenerator
 import models.{BankRepository, Benefit, BenefitRepository, Bill, BillRepository, BillWithData, User, UserRepository, UserWithBank}
 import forms.BenefitForm._
@@ -25,6 +26,7 @@ class BillController @Inject()(
                                repoUser: UserRepository,
                                repoBank: BankRepository,
                                env: Environment,
+                               authAction: AuthAction
                               )
                               (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
@@ -44,19 +46,6 @@ class BillController @Inject()(
     "fonts/Roboto-ThinItalic.ttf",
   ))
 
-//  def exportBillPdf(id: Long): Action[AnyContent] = Action.async { implicit r =>
-//    repo.findBill(id).map { billSeq: Seq[BillWithData] =>
-//      pdfGen.ok(views.html.originalBill(billSeq.head/*, user*/), "http://localhost:9000") }
-//    }
-
-//  def exportBillPdf(id: Long/*, userId: Long*/): Action[AnyContent] = Action.async { implicit r =>
-//    repo.findBill(id).map { billSeq: Seq[BillWithData] =>
-//      repoUser.getUser(1).map { user =>
-//        pdfGen.ok(views.html.originalBill(billSeq.head, user), "http://localhost:9000")
-//      }
-//    }.flatten
-//  }
-
   def exportBillPdf(id: Long/*, userId: Long*/): Action[AnyContent] = Action.async { implicit r =>
     repo.findBill(id).flatMap { billSeq: Seq[BillWithData] =>
       repoUser.getUser(1).flatMap { user =>
@@ -68,7 +57,7 @@ class BillController @Inject()(
     }
   }
 
-  def getBills: Action[AnyContent] = Action.async { implicit request =>
+  def getBills: Action[AnyContent] = authAction.async { implicit request =>
     repo.getListBill.map({ billWithCustomerData =>
       Ok(Json.toJson(billWithCustomerData))
     })
