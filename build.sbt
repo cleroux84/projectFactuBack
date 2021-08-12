@@ -36,8 +36,11 @@ scalacOptions ++= Seq(
   "-Xfatal-warnings"
 )
 
-//libraryDependencies += "org.apache.pdfbox" % "pdfbox" % "2.0.19"
-
+libraryDependencies ++= Seq(
+  "com.pauldijou" %% "jwt-play-json" % "5.0.0",
+  "com.pauldijou" %% "jwt-core" % "5.0.0",
+  "com.auth0" % "jwks-rsa" % "0.6.1"
+)
 
 
 

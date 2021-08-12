@@ -20,4 +20,22 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     val query = slickUser.filter(_.id === id)
     db.run(query.result.head)
   }
+
+  def addUser(newUser: User): Future[Int] = {
+    db.run(slickUser += User
+    (
+      id = newUser.id,
+      civility = newUser.civility,
+      firstName = newUser.firstName,
+      lastName = newUser.lastName,
+      email = newUser.email,
+      phone = newUser.phone,
+      address = newUser.address,
+      city = newUser.city,
+      zipCode = newUser.zipCode,
+      siret = newUser.siret,
+      bankId = newUser.bankId
+    ))
+  }
+
 }
