@@ -2,9 +2,10 @@ package controllers
 
 import auth.AuthAction
 import forms.UserForm._
-import models. UserRepository
+import models.{BankRepository, User, UserRepository}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,6 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(
                               cc: MessagesControllerComponents,
                               repo: UserRepository,
+                              bankRepo: BankRepository,
                               authAction: AuthAction
                               )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
@@ -26,6 +28,11 @@ class UserController @Inject()(
       Ok(Json.toJson(user))})
   }
 
+  def getUserWithBank(email: String): Action[AnyContent] = Action.async { implicit r =>
+    repo.getUserWithBank(email).map { userWithBank =>
+      Ok(Json.toJson(userWithBank))
+    }
+  }
 //  def testUser(id: Long): Action[AnyContent] = Action.async { implicit request =>
 //    repo.getUser(id).map { x =>
 //      Ok(Json.toJson(x))

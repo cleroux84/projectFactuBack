@@ -9,6 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
+  val bankInstance: BankRepository = new BankRepository(dbConfigProvider)
 
   import profile.api._
 
@@ -19,6 +20,14 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def getUser(email: String): Future[User] = {
     val query = slickUser.filter(_.email === email)
     db.run(query.result.head)
+  }
+
+  def getUserWithBank(email: String): Future[UserWithBank] = {
+    getUser(email).map { user =>
+      bankInstance.getBank(user).map { bankOption =>
+        UserWithBank.fromUserToBank(user, bankOption.head)
+      }
+    }.flatten
   }
 
   def addUser(newUser: User): Future[Int] = {
