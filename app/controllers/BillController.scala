@@ -46,16 +46,16 @@ class BillController @Inject()(
     "fonts/Roboto-ThinItalic.ttf",
   ))
 
-//  def exportBillPdf(id: Long/*, userId: Long*/): Action[AnyContent] = Action.async { implicit r =>
-//    repo.findBill(id).flatMap { billSeq: Seq[BillWithData] =>
-//      repoUser.getUser(1).flatMap { user =>
-//        repoBank.getBank(user).map { bank =>
-//          val userAndBank = UserWithBank.fromUserToBank(user, bank.head)
-//          pdfGen.ok(views.html.originalBill(billSeq.head, userAndBank), "http://localhost:9000")
-//        }
-//      }
-//    }
-//  }
+  def exportBillPdf(id: Long, userMail: String): Action[AnyContent] = Action.async { implicit r =>
+    repo.findBill(id).flatMap { billSeq: Seq[BillWithData] =>
+      repoUser.getUser(userMail).flatMap { user =>
+        repoBank.getBank(user).map { bank =>
+          val userAndBank = UserWithBank.fromUserToBank(user, bank.head)
+          pdfGen.ok(views.html.originalBill(billSeq.head, userAndBank), "http://localhost:9000")
+        }
+      }
+    }
+  }
 
   def getBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
     repo.getListBillByUser(userId).map({ billWithCustomerData =>

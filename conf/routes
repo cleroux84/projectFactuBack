@@ -18,7 +18,7 @@ POST    /updateCustomer/:id             controllers.CustomerController.updateCus
 GET     /listBill                       controllers.BillController.getBills()
 GET     /listBillByUser/:userId         controllers.BillController.getBillsByUser(userId: Long)
 POST    /addBill                        controllers.BillController.addBill
-#GET     /export/bill.pdf/:id            controllers.BillController.exportBillPdf(id: Long)
+GET     /export/bill.pdf/:id/:userMail            controllers.BillController.exportBillPdf(id: Long, userMail: String)
 
 
 #GET     /export/bill.pdf/:id/:userId    controllers.BillController.exportBillPdf(id: Long, userId: Long)
