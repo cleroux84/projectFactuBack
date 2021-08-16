@@ -49,4 +49,10 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     ))
   }
 
+def updateUser(id: Long, civility: String, firstName: String, lastName: String, email: String, phone: String, address: String, city: String, zipCode: String, siret: String, bankId: Option[Long], role: Int, authId: String): Future[Int] = {
+    db.run(slickUser
+    .filter(_.id === id)
+    .map(x=>(x.civility, x.firstName, x.lastName, x.email, x.phone, x.address, x.city, x.zipCode, x.siret, x.bankId, x.role, x.authId))
+    .update(civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId, role, authId))
+  }
 }

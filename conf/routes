@@ -8,6 +8,7 @@ GET     /getCurrentUser/:email          controllers.UserController.getCurrentUse
 GET     /getUserList                    controllers.UserController.getUserList()
 POST    /addUser                        controllers.UserController.addUser
 GET     /getProfile/:email              controllers.UserController.getUserWithBank(email: String)
+POST    /updateUser/:id                 controllers.UserController.updateUser(id: Long)
 
 #Customer
 GET     /listCustomer                   controllers.CustomerController.getCustomers()

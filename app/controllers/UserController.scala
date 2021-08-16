@@ -48,4 +48,12 @@ class UserController @Inject()(
     Future.successful(Ok)
   }
 
+  def updateUser(id: Long): Action[JsValue] = Action.async(parse.json) { implicit r =>
+    r.body.validate[CreateUserForm] match {
+      case JsSuccess(data, _) =>
+        repo.updateUser(id, data.civility, data.firstName, data.lastName, data.email, data.phone, data.address, data.city, data.zipCode, data.siret, data.bankId, data.role, data.authId).map{ _ =>Ok}
+      case JsError(errors) => Future.successful(BadRequest(Json.obj("status" -> "KO", "message" ->JsError.toJson(errors))))
+    }
+  }
+
 }
