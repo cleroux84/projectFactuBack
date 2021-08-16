@@ -25,7 +25,7 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def getUserWithBank(email: String): Future[UserWithBank] = {
     getUser(email).map { user =>
       bankInstance.getBank(user).map { bankOption =>
-        UserWithBank.fromUserToBank(user, bankOption.head)
+        UserWithBank.fromUserToBank(user, bankOption)
       }
     }.flatten
   }

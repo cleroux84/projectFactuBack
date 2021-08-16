@@ -27,7 +27,7 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def city = column[String]("city")
     def zipCode = column[String]("zipCode")
     def siret = column[String]("siret")
-    def bankId = column[Long]("bankId")
+    def bankId = column[Option[Long]]("bankId")
     def role = column[Int]("role")
     def authId = column[String]("authId")
 

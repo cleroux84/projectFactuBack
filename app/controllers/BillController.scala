@@ -50,7 +50,7 @@ class BillController @Inject()(
     repo.findBill(id).flatMap { billSeq: Seq[BillWithData] =>
       repoUser.getUser(userMail).flatMap { user =>
         repoBank.getBank(user).map { bank =>
-          val userAndBank = UserWithBank.fromUserToBank(user, bank.head)
+          val userAndBank = UserWithBank.fromUserToBank(user, bank)
           pdfGen.ok(views.html.originalBill(billSeq.head, userAndBank), "http://localhost:9000")
         }
       }

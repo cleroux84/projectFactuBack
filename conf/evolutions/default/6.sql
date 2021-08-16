@@ -5,13 +5,13 @@ CREATE TABLE `user` (
                         `civility` VARCHAR(255) NOT NULL,
                         `firstName` VARCHAR(255) NOT NULL,
                         `lastName` VARCHAR(255) NOT NULL,
-                        `email` VARCHAR(255) NOT NULL,
+                        `email` VARCHAR(255) NOT NULL UNIQUE,
                         `phone` VARCHAR(255) NOT NULL,
                         `address` VARCHAR(255) NOT NULL,
                         `city` VARCHAR(255) NOT NULL,
                         `zipCode` VARCHAR(255) NOT NULL,
                         `siret` VARCHAR(255) NOT NULL,
-                        `bankId` BIGINT(20) NOT NULL,
+                        `bankId` BIGINT(20),
                         PRIMARY KEY (`id`)
 );
 
