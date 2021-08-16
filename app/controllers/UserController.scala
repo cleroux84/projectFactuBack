@@ -21,16 +21,16 @@ class UserController @Inject()(
     })
   }
 
-  def getCurrentUser(id: Long): Action[AnyContent] = Action.async { implicit req =>
-    repo.getUser(id).map({ user =>
+  def getCurrentUser(email: String): Action[AnyContent] = Action.async { implicit req =>
+    repo.getUser(email).map({ user =>
       Ok(Json.toJson(user))})
   }
 
-  def testUser(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    repo.getUser(id).map { x =>
-      Ok(Json.toJson(x))
-    }
-  }
+//  def testUser(id: Long): Action[AnyContent] = Action.async { implicit request =>
+//    repo.getUser(id).map { x =>
+//      Ok(Json.toJson(x))
+//    }
+//  }
 
   def addUser: Action[JsValue] = Action.async(parse.json) {implicit r =>
     r.body.validate[CreateUserForm] match {

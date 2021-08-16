@@ -15,8 +15,8 @@ class BankRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
 //    db.run(slickBank += bank).map(res => "Bank successfully created")
 //  }
 
-  def getBank(user: User): Future[Option[Bank]] = {
-    val query = slickBank.filter(_.id === user.id )
-    db.run(query.result.headOption)
-  }
+//  def getBank(user: User): Future[Option[Bank]] = {
+//    val query = slickBank.filter(_.id === user.bankId )
+//    db.run(query.result.headOption)
+//  }
 }

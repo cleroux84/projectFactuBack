@@ -4,9 +4,8 @@
 # ~~~~
 
 #Users
-GET     /getCurrentUser/:id             controllers.UserController.getCurrentUser(id: Long)
+GET     /getCurrentUser/:email          controllers.UserController.getCurrentUser(email: String)
 GET     /getUserList                    controllers.UserController.getUserList()
-GET     /getUserTest/:id                controllers.UserController.testUser(id: Long)
 POST    /addUser                        controllers.UserController.addUser
 
 #Customer
@@ -17,8 +16,9 @@ POST    /updateCustomer/:id             controllers.CustomerController.updateCus
 
 #Bills
 GET     /listBill                       controllers.BillController.getBills()
+GET     /listBillByUser/:userId         controllers.BillController.getBillsByUser(userId: Long)
 POST    /addBill                        controllers.BillController.addBill
-GET     /export/bill.pdf/:id            controllers.BillController.exportBillPdf(id: Long)
+#GET     /export/bill.pdf/:id            controllers.BillController.exportBillPdf(id: Long)
 
 
 #GET     /export/bill.pdf/:id/:userId    controllers.BillController.exportBillPdf(id: Long, userId: Long)

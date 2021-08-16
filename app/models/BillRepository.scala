@@ -56,21 +56,17 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     })
   }
 
-//  def getBillWithData(billCustomerSeq: Seq[(Bill, Customer)]): Future[Seq[BillWithData]] = {
-//    Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
-//      benefitInstance.getListBenefit(billCustomerBenefit._1).map { benefitSeq =>
-//        val benefitWithAmount = benefitSeq.map { x =>
-//          BenefitWithMount.fromBenefitToAmounts(x)}
-//        val totalHT = benefitWithAmount.map(_.amountHt).sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-//        val seqHt = benefitWithAmount.map { benef => benef.amountHt * (1 + (benef.vatRate/100))}
-//        val totalTtc = seqHt.sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-//        BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
-//      }
-//    })
-//  }
-
   def getListBill: Future[Seq[BillWithData]] = {
     val query = slickBill
+      .join(slickCustomer).on(_.customerId === _.id)
+    db.run(query.result).flatMap { billCustomerSeq =>
+      this.getBillWithData(billCustomerSeq).map(_.sortBy(_.billNumber).reverse)
+    }
+  }
+
+  def getListBillByUser(userId: Long): Future[Seq[BillWithData]] = {
+    val query = slickBill
+      .filter(_.userId === userId)
       .join(slickCustomer).on(_.customerId === _.id)
     db.run(query.result).flatMap { billCustomerSeq =>
       this.getBillWithData(billCustomerSeq).map(_.sortBy(_.billNumber).reverse)

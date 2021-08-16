@@ -13,7 +13,9 @@ case class User(
                city: String,
                zipCode: String,
                siret: String,
-               bankId: Long
+               bankId: Long,
+               role: Int,
+               authId: String
                ) {
 }
 

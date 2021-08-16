@@ -16,8 +16,8 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     db.run(slickUser.result)
   }
 
-  def getUser(id: Long): Future[User] = {
-    val query = slickUser.filter(_.id === id)
+  def getUser(email: String): Future[User] = {
+    val query = slickUser.filter(_.email === email)
     db.run(query.result.head)
   }
 
@@ -34,7 +34,9 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       city = newUser.city,
       zipCode = newUser.zipCode,
       siret = newUser.siret,
-      bankId = newUser.bankId
+      bankId = newUser.bankId,
+      role = newUser.role,
+      authId = newUser.authId
     ))
   }
 

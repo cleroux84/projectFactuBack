@@ -28,8 +28,10 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def zipCode = column[String]("zipCode")
     def siret = column[String]("siret")
     def bankId = column[Long]("bankId")
+    def role = column[Int]("role")
+    def authId = column[String]("authId")
 
-    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId) <> ((User.apply _).tupled, User.unapply)
+    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId, role, authId) <> ((User.apply _).tupled, User.unapply)
 
   }
 
@@ -56,8 +58,9 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def created = column[DateTime]("created")
     def periodCovered = column[String]("periodCovered")
     def billNumber = column[String]("billNumber")
+    def userId = column[Long]("userId")
 
-    def * = (id, customerId, created, periodCovered, billNumber) <> ((Bill.apply _).tupled, Bill.unapply)
+    def * = (id, customerId, created, periodCovered, billNumber, userId) <> ((Bill.apply _).tupled, Bill.unapply)
   }
 
   class BenefitTable(tag: Tag) extends Table[Benefit](tag, "benefit") {

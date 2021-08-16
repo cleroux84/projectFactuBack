@@ -11,6 +11,7 @@ case class Bill(
                  created: DateTime,
                  periodCovered: String,
                  billNumber: String,
+                 userId: Long
                )
 
 object Bill {
@@ -31,7 +32,7 @@ case class BillWithData(
                  benefit: Seq[BenefitWithMount],
                  amountHt: BigDecimal,
                  amountTtc: BigDecimal,
-                 invoiceDueBy: DateTime
+                 invoiceDueBy: DateTime,
                ) {
 }
 
