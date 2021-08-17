@@ -56,4 +56,8 @@ class UserController @Inject()(
     }
   }
 
+  def deleteUser(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    repo.deleteUser(id).map(_ => Redirect(routes.UserController.getUserList()))
+  }
+
 }

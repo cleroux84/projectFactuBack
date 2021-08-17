@@ -19,4 +19,15 @@ class BankRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     val query = slickBank.filter(_.id === user.bankId )
     db.run(query.result.headOption)
   }
+
+  def updateBank(id: Long, name: String, bankCode: String, guichetCode: String, account: String, ribKey: BigDecimal, iban: String): Future[Int] = {
+    db.run(slickBank
+    .filter(_.id === id)
+    .map(x=>(x.name, x.bankCode, x.guichetCode, x.account, x.ribKey, x.iban))
+    .update(name, bankCode, guichetCode, account, ribKey, iban))
+  }
+
+  def deleteBank(id: Long): Future[Int] = db.run{
+    slickBank.filter(_.id === id).delete
+  }
 }

@@ -9,6 +9,12 @@ GET     /getUserList                    controllers.UserController.getUserList()
 POST    /addUser                        controllers.UserController.addUser
 GET     /getProfile/:email              controllers.UserController.getUserWithBank(email: String)
 POST    /updateUser/:id                 controllers.UserController.updateUser(id: Long)
+DELETE  /deleteUser/:id                 controllers.UserController.deleteUser(id:Long)
+
+#Bank
+POST    /addBank                        controllers.BankController.addBank
+POST    /updateBank/:id                 controllers.BankController.updateBank(id: Long)
+DELETE  /deleteBank/:id                 controllers.BankController.deleteBank(id: Long)
 
 #Customer
 GET     /listCustomer                   controllers.CustomerController.getCustomers()
