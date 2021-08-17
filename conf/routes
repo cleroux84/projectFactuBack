@@ -12,7 +12,7 @@ POST    /updateUser/:id                 controllers.UserController.updateUser(id
 DELETE  /deleteUser/:id                 controllers.UserController.deleteUser(id:Long)
 
 #Bank
-POST    /addBank                        controllers.BankController.addBank
+POST    /addBank                        controllers.BankController.addBank()
 POST    /updateBank/:id                 controllers.BankController.updateBank(id: Long)
 DELETE  /deleteBank/:id                 controllers.BankController.deleteBank(id: Long)
 
