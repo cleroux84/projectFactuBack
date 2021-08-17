@@ -19,7 +19,7 @@ class BankController @Inject()(
   def addBank: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[CreateBankForm] match {
       case  JsSuccess(createBankForm, _) =>
-        repo.addBank(createBankForm.tobankCustom)
+        repo.addBank(createBankForm.toBankCustom)
       case JsError(errors) => println(errors)
     }
     Future.successful(Ok)
@@ -28,7 +28,7 @@ class BankController @Inject()(
   def updateBank(id: Long): Action[JsValue] = Action.async(parse.json) { implicit r =>
     r.body.validate[CreateBankForm] match {
       case JsSuccess(data, _) =>
-        repo.updateBank(id, data.name, data.bankCode, data.guichetCode, data.account, data.ribKey, data.iban).map{ _ =>Ok}
+        repo.updateBank(id, data.name, data.bankCode, data.guichetCode, data.account, data.ribKey, data.iban, data.userId).map{ _ =>Ok}
       case JsError(errors) => Future.successful(BadRequest(Json.obj("status" -> "KO", "message" ->JsError.toJson(errors))))
     }
   }

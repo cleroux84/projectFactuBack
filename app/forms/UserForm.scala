@@ -15,7 +15,6 @@ object UserForm {
                            city: String,
                            zipCode: String,
                            siret: String,
-                           bankId: Option[Long],
                            role: Int,
                            authId: String
                            ){
@@ -30,7 +29,6 @@ object UserForm {
       city = this.city,
       zipCode = this.zipCode,
       siret = this.siret,
-      bankId = this.bankId,
       role = this.role,
       authId = this.authId
     )

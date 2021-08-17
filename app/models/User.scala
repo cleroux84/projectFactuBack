@@ -13,7 +13,6 @@ case class User(
                city: String,
                zipCode: String,
                siret: String,
-               bankId: Option[Long],
                role: Int,
                authId: String
                ) {

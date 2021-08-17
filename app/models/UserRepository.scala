@@ -43,17 +43,16 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       city = newUser.city,
       zipCode = newUser.zipCode,
       siret = newUser.siret,
-      bankId = newUser.bankId,
       role = newUser.role,
       authId = newUser.authId
     ))
   }
 
-  def updateUser(id: Long, civility: String, firstName: String, lastName: String, email: String, phone: String, address: String, city: String, zipCode: String, siret: String, bankId: Option[Long], role: Int, authId: String): Future[Int] = {
+  def updateUser(id: Long, civility: String, firstName: String, lastName: String, email: String, phone: String, address: String, city: String, zipCode: String, siret: String, role: Int, authId: String): Future[Int] = {
       db.run(slickUser
       .filter(_.id === id)
-      .map(x=>(x.civility, x.firstName, x.lastName, x.email, x.phone, x.address, x.city, x.zipCode, x.siret, x.bankId, x.role, x.authId))
-      .update(civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId, role, authId))
+      .map(x=>(x.civility, x.firstName, x.lastName, x.email, x.phone, x.address, x.city, x.zipCode, x.siret, x.role, x.authId))
+      .update(civility, firstName, lastName, email, phone, address, city, zipCode, siret, role, authId))
     }
 
   def deleteUser(id: Long): Future[Int] = db.run{

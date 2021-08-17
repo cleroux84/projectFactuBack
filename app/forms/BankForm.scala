@@ -11,16 +11,18 @@ object BankForm {
                            guichetCode: String,
                            account: String,
                            ribKey: BigDecimal,
-                           iban: String
+                           iban: String,
+                           userId: Long
                            ){
-    def tobankCustom: Bank = Bank(
+    def toBankCustom: Bank = Bank(
       id = 0L,
       name = this.name,
       bankCode = this.bankCode,
       guichetCode = this.guichetCode,
       account = this.account,
       ribKey = this.ribKey,
-      iban = this.iban
+      iban = this.iban,
+      userId = this.userId
     )
   }
 

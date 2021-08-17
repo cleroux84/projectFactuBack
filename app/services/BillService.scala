@@ -27,11 +27,10 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def city = column[String]("city")
     def zipCode = column[String]("zipCode")
     def siret = column[String]("siret")
-    def bankId = column[Option[Long]]("bankId")
     def role = column[Int]("role")
     def authId = column[String]("authId")
 
-    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId, role, authId) <> ((User.apply _).tupled, User.unapply)
+    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, role, authId) <> ((User.apply _).tupled, User.unapply)
 
   }
 
@@ -82,8 +81,9 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def account = column[String]("account")
     def ribKey = column[BigDecimal]("ribKey")
     def iban = column[String]("iban")
+    def userId = column[Long]("userId")
 
-    def * = (id, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
+    def * = (id, name, bankCode, guichetCode, account, ribKey, iban, userId) <> ((Bank.apply _).tupled, Bank.unapply)
   }
 
 }
