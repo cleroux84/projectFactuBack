@@ -17,27 +17,23 @@ class UserController @Inject()(
                               authAction: AuthAction
                               )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  def getUserList: Action[AnyContent] = Action.async { implicit request =>
+  def getUserList: Action[AnyContent] = authAction.async { implicit request =>
     repo.getUserList.map({ users =>
       Ok(Json.toJson(users))
     })
   }
 
-  def getCurrentUser(email: String): Action[AnyContent] = Action.async { implicit req =>
+  def getCurrentUser(email: String): Action[AnyContent] = authAction.async { implicit req =>
+//  def getCurrentUser(email: String): Action[AnyContent] = Action.async { implicit req =>
     repo.getUser(email).map({ user =>
       Ok(Json.toJson(user))})
   }
 
-  def getUserWithBank(email: String): Action[AnyContent] = Action.async { implicit r =>
+  def getUserWithBank(email: String): Action[AnyContent] = authAction.async { implicit r =>
     repo.getUserWithBank(email).map { userWithBank =>
       Ok(Json.toJson(userWithBank))
     }
   }
-//  def testUser(id: Long): Action[AnyContent] = Action.async { implicit request =>
-//    repo.getUser(id).map { x =>
-//      Ok(Json.toJson(x))
-//    }
-//  }
 
   def addUser: Action[JsValue] = Action.async(parse.json) {implicit r =>
     r.body.validate[CreateUserForm] match {
@@ -48,7 +44,7 @@ class UserController @Inject()(
     Future.successful(Ok)
   }
 
-  def updateUser(id: Long): Action[JsValue] = Action.async(parse.json) { implicit r =>
+  def updateUser(id: Long): Action[JsValue] = authAction.async(parse.json) { implicit r =>
     r.body.validate[CreateUserForm] match {
       case JsSuccess(data, _) =>
         repo.updateUser(id, data.civility, data.firstName, data.lastName, data.email, data.phone, data.address, data.city, data.zipCode, data.siret, data.role, data.authId).map{ _ =>Ok}

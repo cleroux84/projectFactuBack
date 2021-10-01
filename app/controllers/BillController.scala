@@ -69,7 +69,7 @@ class BillController @Inject()(
     })
   }
 
-  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def addBill: Action[JsValue] = authAction.async(parse.json) { implicit request =>
     request.body.validate[CreateBillForm] match {
       case JsSuccess(createBillForm, _) =>
         repo.composeBillNumber().flatMap { number =>

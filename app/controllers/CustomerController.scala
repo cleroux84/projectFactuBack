@@ -1,16 +1,19 @@
 
 package controllers
 
-import models. CustomerRepository
+import auth.AuthAction
+import models.CustomerRepository
 import play.api.mvc._
 import forms.CustomerForm._
+
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 
 class CustomerController @Inject()(
                                     cc:MessagesControllerComponents,
-                                    repo: CustomerRepository)(implicit ec: ExecutionContext) extends AbstractController(cc) {
+                                    repo: CustomerRepository,
+                                    authAction: AuthAction)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def getCustomers: Action[AnyContent] = Action.async { implicit request =>
     repo.getList.map({ customers =>
@@ -18,11 +21,11 @@ class CustomerController @Inject()(
     })
   }
 
-  def deleteCustomer(id: Long): Action[AnyContent] = Action.async { implicit request =>
+  def deleteCustomer(id: Long): Action[AnyContent] = authAction.async { implicit request =>
     repo.deleteCustomer(id).map(_ => Redirect(routes.CustomerController.getCustomers()))
   }
 
-  def addCustomer: Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def addCustomer: Action[JsValue] = authAction.async(parse.json) { implicit request =>
 //    println(request.body) // -> parse.json avec body qui un json
     request.body.validate[CreateCustomerForm] match { // valide que le json correspond à une case class que j'ai créé
       case JsSuccess(createCustomerForm, _) =>
@@ -32,7 +35,7 @@ class CustomerController @Inject()(
     Future.successful(Ok)
   }
 
-  def updateCustomer(id: Long): Action[JsValue] = Action.async(parse.json) {implicit request =>
+  def updateCustomer(id: Long): Action[JsValue] = authAction.async(parse.json) {implicit request =>
     request.body.validate[CreateCustomerForm] match {
       case JsSuccess(data, _) =>
         repo.updateCustomer(id, data.civility, data.firstName, data.lastName, data.email, data.phone, data.phone2, data.company, data.address, data.city, data.zipCode, data.VATNumber).map{_ =>Ok}

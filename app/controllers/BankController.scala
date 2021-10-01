@@ -16,7 +16,7 @@ class BankController @Inject()(
                               authAction: AuthAction
                               )(implicit ex : ExecutionContext) extends AbstractController(cc) {
 
-  def addBank: Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def addBank: Action[JsValue] = authAction.async(parse.json) { implicit request =>
     request.body.validate[CreateBankForm] match {
       case  JsSuccess(createBankForm, _) =>
         repo.addBank(createBankForm.toBankCustom)
@@ -25,7 +25,7 @@ class BankController @Inject()(
     Future.successful(Ok)
   }
 
-  def updateBank(id: Long): Action[JsValue] = Action.async(parse.json) { implicit r =>
+  def updateBank(id: Long): Action[JsValue] = authAction.async(parse.json) { implicit r =>
     r.body.validate[CreateBankForm] match {
       case JsSuccess(data, _) =>
         repo.updateBank(id, data.name, data.bankCode, data.guichetCode, data.account, data.ribKey, data.iban, data.userId).map{ _ =>Ok}
@@ -33,7 +33,7 @@ class BankController @Inject()(
     }
   }
 
-  def deleteBank(id: Long): Action[AnyContent] = Action.async { implicit r =>
+  def deleteBank(id: Long): Action[AnyContent] = authAction.async { implicit r =>
     repo.deleteBank(id).map(_ => Redirect(routes.UserController.getUserList()))
   }
 
