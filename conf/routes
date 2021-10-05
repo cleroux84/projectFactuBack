@@ -26,8 +26,13 @@ POST    /updateCustomer/:id             controllers.CustomerController.updateCus
 GET     /listBill                       controllers.BillController.getBills()
 GET     /listBillByUser/:userId         controllers.BillController.getBillsByUser(userId: Long)
 POST    /addBill                        controllers.BillController.addBill
-GET     /export/bill.pdf/:id/:userMail            controllers.BillController.exportBillPdf(id: Long, userMail: String)
-
+GET     /export/bill.pdf/:id/:userMail  controllers.BillController.exportBillPdf(id: Long, userMail: String)
+GET     /lateBill                       controllers.BillController.getLateBills()
+GET     /lateBills/:userId              controllers.BillController.getLateBillsByUser(userId: Long)
+GET     /unPaidBills                    controllers.BillController.getUnpaidBills()
+GET     /unPaidBillsByUser/:userId      controllers.BillController.getUnpaidBillsByUser(userId: Long)
+GET     /thisBill/:id                   controllers.BillController.getThisBill(id: Long)
+POST    /updatePayment/:id              controllers.BillController.updatePayment(id: Long)
 
 #GET     /export/bill.pdf/:id/:userId    controllers.BillController.exportBillPdf(id: Long, userId: Long)
 # Map static resources from the /public folder to the /assets URL path

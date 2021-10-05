@@ -56,6 +56,11 @@ class BillController @Inject()(
       }
     }
   }
+  def getThisBill(id: Long): Action[AnyContent] = Action.async { implicit r =>
+    repo.findBill(id).map { billSeq =>
+      Ok(Json.toJson(billSeq))
+    }
+  }
 
   def getBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
     repo.getListBillByUser(userId).map({ billWithCustomerData =>
@@ -66,6 +71,30 @@ class BillController @Inject()(
   def getBills: Action[AnyContent] = authAction.async { implicit request =>
     repo.getListBill.map({ billWithCustomerData =>
       Ok(Json.toJson(billWithCustomerData))
+    })
+  }
+
+  def getLateBills: Action[AnyContent] = authAction.async { implicit request =>
+    repo.getLateBills.map({ billWithCustomerData =>
+      Ok(Json.toJson(billWithCustomerData))
+    })
+  }
+
+  def getUnpaidBills: Action[AnyContent] = authAction.async { implicit request =>
+    repo.getUnpaidBills.map({ billSeq =>
+      Ok(Json.toJson(billSeq))
+    })
+  }
+
+  def getUnpaidBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
+    repo.getUnpaidBillsByUser(userId).map({ billSeq =>
+      Ok(Json.toJson(billSeq))
+    })
+  }
+
+  def getLateBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
+    repo.getLateBillByUser(userId).map({ billLate =>
+      Ok(Json.toJson(billLate))
     })
   }
 
@@ -89,6 +118,14 @@ class BillController @Inject()(
         Future.successful(BadRequest)
       }
     }
+
+  def updatePayment(id: Long): Action[JsValue] = authAction.async(parse.json) { implicit request =>
+    request.body.validate[CreateBillForm] match {
+      case JsSuccess(data, _) =>
+        repo.updatePayment(id, data.paid, data.paymentDate).map(_ => Ok)
+      case JsError(errors) => Future.successful(BadRequest(Json.obj()))
+    }
+  }
 
   //fonctionne mais inutile pour les factures :
   //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>

@@ -12,6 +12,7 @@ import services.BillService
 import java.text.DecimalFormat
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
+import scala.math.Ordered.orderingToOrdered
 
 @Singleton
 class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
@@ -41,6 +42,25 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def composePaymentStatus(invoiceDueBy: DateTime, paid: Boolean): String = {
+    if (paid) {
+      "paid"
+    } else {
+      invoiceDueBy match {
+        case a if a < DateTime.now() => "latePayment"
+        case b if b > DateTime.now() => "waitingPayment"
+      }
+    }
+  }
+
+//  def checkifPaid(paid: Boolean, invoiceDueBy: DateTime) = {
+//   if (paid) {
+//     "paid"
+//   } else {
+//     composePaymentStatus(invoiceDueBy)
+//   }
+//  }
+
   def getBillWithData(billCustomerSeq: Seq[(Bill, Customer)]): Future[Seq[BillWithData]] = {
 
     Future.sequence(billCustomerSeq.map { billCustomerBenefit =>
@@ -51,7 +71,12 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
         val totalHT = benefitWithAmount.map(_.amountHt).sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
         val seqHt = benefitWithAmount.map { benef => benef.amountHt * (1 + (benef.vatRate/100))}
         val totalTtc = seqHt.sum.setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
-        BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc)
+
+        val invoiceDueBy = billCustomerBenefit._1.created.plusDays(15)
+        val paid = billCustomerSeq.map(_._1.paid)
+        val paymentStatus = composePaymentStatus(invoiceDueBy, paid.reduce(_&&_))
+//        TODO "payé" ne fonctionne pas
+        BillWithData.fromBillAndCustomerTables(billCustomerBenefit._1, billCustomerBenefit._2, benefitWithAmount, totalHT, totalTtc, paymentStatus)
       }
     })
   }
@@ -73,6 +98,43 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     }
   }
 
+  def getLateBillByUser(userId: Long): Future[Seq[BillWithData]] = {
+    val q = slickBill
+      .filter(_.userId === userId)
+      .filter(_.paid === false)
+      .join(slickCustomer).on(_.customerId === _.id)
+    db.run(q.result).flatMap { billCustomerSeq =>
+      this.getBillWithData(billCustomerSeq).map(_.sortBy(_.billNumber))
+    }
+  }
+
+  def getUnpaidBills: Future[Seq[BillWithData]] = {
+    val query = slickBill
+      .filter(_.paid === false)
+      .join(slickCustomer).on(_.customerId === _.id)
+    db.run(query.result).flatMap { billCustomerSeq =>
+      this.getBillWithData(billCustomerSeq).map(_.filter(_.invoiceDueBy < DateTime.now()))
+    }
+  }
+  def getLateBills: Future[Seq[BillWithData]] = {
+    val query = slickBill
+      .filter(_.paid === false)
+      .join(slickCustomer).on(_.customerId === _.id)
+    db.run(query.result).flatMap { billCustomerSeq =>
+      this.getBillWithData(billCustomerSeq).map(_.sortBy(_.billNumber))
+    }
+  }
+
+  def getUnpaidBillsByUser(userId: Long): Future[Seq[BillWithData]] = {
+    val query = slickBill
+      .filter(_.userId === userId)
+      .filter(_.paid === false)
+      .join(slickCustomer).on(_.customerId === _.id)
+    db.run(query.result).flatMap { billCustomerSeq =>
+      this.getBillWithData(billCustomerSeq).map(_.filter(_.invoiceDueBy < DateTime.now()))
+    }
+  }
+
   def findBill(id: Long): Future[Seq[BillWithData]] = {
     val q = slickBill.filter(_.id === id)
       .join(slickCustomer).on(_.customerId === _.id)
@@ -84,6 +146,15 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
   def addBill(newBill: Bill): Future[Long] = {
     db.run(slickBill returning slickBill.map(_.id) += newBill)
   }
+
+
+  def updatePayment(id: Long, paid: Boolean, paymentDate: Option[DateTime]): Future[Int] = {
+    db.run(slickBill
+      .filter(_.id === id)
+      .map(x=>(x.paid, x.paymentDate))
+      .update(paid, paymentDate))
+  }
+
 
   //  def deleteBill(id: Long): Future[Int] = {db.run(
   //    slickBill.filter(_.id === id).delete)
