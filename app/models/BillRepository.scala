@@ -26,6 +26,7 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
     db.run(query)
   }
 
+
   def composeBillNumber(): Future[String] = {
     val date = DateTime.now().toString()
     val year = date.split("-")(0)
@@ -80,6 +81,26 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       }
     })
   }
+
+//  def getSumBills(billCustomerSeq: Seq[(Bill, Customer)]): Future[BigDecimal] = {
+//    this.getBillWithData(billCustomerSeq).map{ x =>
+//      val billAmount = x.map(_.amountHt).sum
+//      billAmount
+//    }
+//  }
+
+//  def getSumBills: Future[Future[BigDecimal]] = {
+//    val q = slickBill
+//      .filter(_.created.toString().split("-")(0) > "2021")
+//      .join(slickCustomer).on(_.customerId === _.id)
+//    db.run(q.result).map { billCustomerSeq =>
+//      this.getBillWithData(billCustomerSeq).map { bill =>
+//        bill.map(_.amountHt).sum
+//      }
+//    }
+//  }
+
+
 
   def getListBill: Future[Seq[BillWithData]] = {
     val query = slickBill

@@ -35,7 +35,7 @@ class UserController @Inject()(
     }
   }
 
-  def addUser: Action[JsValue] = Action.async(parse.json) {implicit r =>
+  def addUser: Action[JsValue] = authAction.async(parse.json) {implicit r =>
     r.body.validate[CreateUserForm] match {
       case JsSuccess(createUserForm, _) =>
         repo.addUser(createUserForm.toUserCustom)
