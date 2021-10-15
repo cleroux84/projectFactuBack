@@ -38,7 +38,8 @@ case class BillWithData(
                  invoiceDueBy: DateTime,
                  paid: Boolean,
                  paymentDate: Option[DateTime],
-                 paymentStatus: String
+                 paymentStatus: String,
+                 userId: Long
                ) {
 }
 
@@ -51,7 +52,7 @@ object BillWithData {
                                 benefit: Seq[BenefitWithMount],
                                 amountHt: BigDecimal,
                                 amountTtc: BigDecimal,
-                                paymentStatus: String
+                                paymentStatus: String,
                                ): BillWithData = {
     BillWithData(
       id = bill.id,
@@ -65,7 +66,8 @@ object BillWithData {
       invoiceDueBy = bill.created.plusDays(15),
       paid= bill.paid,
       paymentDate = bill.paymentDate,
-      paymentStatus = paymentStatus
+      paymentStatus = paymentStatus,
+      userId = bill.userId
     )
   }
 }
