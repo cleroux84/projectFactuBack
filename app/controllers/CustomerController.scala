@@ -2,13 +2,13 @@
 package controllers
 
 import auth.AuthAction
-import models.CustomerRepository
 import play.api.mvc._
 import forms.CustomerForm._
 
 import javax.inject._
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import repositories.CustomerRepository
 
 class CustomerController @Inject()(
                                     cc:MessagesControllerComponents,

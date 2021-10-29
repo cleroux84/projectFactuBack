@@ -1,5 +1,6 @@
-package models
+package repositories
 
+import models.{User, UserWithBank}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import services.BillService
 import slick.jdbc.JdbcProfile

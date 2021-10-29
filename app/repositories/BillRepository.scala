@@ -1,16 +1,15 @@
-package models
+package repositories
 
+import com.github.tototoshi.slick.MySQLJodaSupport._
+import models._
 import org.joda.time.DateTime
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import com.github.tototoshi.slick.MySQLJodaSupport._
+import services.BillService
 import slick.jdbc.JdbcProfile
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{Await, ExecutionContext, Future}
-import services.BillService
-
 import java.text.DecimalFormat
-import scala.concurrent.duration.DurationInt
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.math.Ordered.orderingToOrdered
 
@@ -53,14 +52,6 @@ class BillRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
       }
     }
   }
-
-//  def checkifPaid(paid: Boolean, invoiceDueBy: DateTime) = {
-//   if (paid) {
-//     "paid"
-//   } else {
-//     composePaymentStatus(invoiceDueBy)
-//   }
-//  }
 
   def getBillWithData(billCustomerSeq: Seq[(Bill, Customer)]): Future[Seq[BillWithData]] = {
 

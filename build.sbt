@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test
+libraryDependencies += "org.scalatestplus" %% "mockito-3-12" % "3.2.10.0" % "test"
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "5.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0",

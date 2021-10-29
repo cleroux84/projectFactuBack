@@ -2,9 +2,10 @@ package controllers
 
 import auth.AuthAction
 import forms.UserForm._
-import models.{BankRepository, User, UserRepository}
+import models.User
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import repositories.{BankRepository, UserRepository}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,7 +14,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserController @Inject()(
                               cc: MessagesControllerComponents,
                               repo: UserRepository,
-                              bankRepo: BankRepository,
                               authAction: AuthAction
                               )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
@@ -47,7 +47,7 @@ class UserController @Inject()(
   def updateUser(id: Long): Action[JsValue] = authAction.async(parse.json) { implicit r =>
     r.body.validate[CreateUserForm] match {
       case JsSuccess(data, _) =>
-        repo.updateUser(id, data.civility, data.firstName, data.lastName, data.email, data.phone, data.address, data.city, data.zipCode, data.siret, data.role, data.authId).map{ _ =>Ok}
+        repo.updateUser(id, data.civility, data.firstName, data.lastName.toUpperCase(), data.email, data.phone, data.address, data.city, data.zipCode, data.siret, data.role, data.authId).map{ _ =>Ok}
       case JsError(errors) => Future.successful(BadRequest(Json.obj("status" -> "KO", "message" ->JsError.toJson(errors))))
     }
   }

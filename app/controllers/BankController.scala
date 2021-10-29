@@ -2,9 +2,9 @@ package controllers
 
 import auth.AuthAction
 import forms.BankForm.CreateBankForm
-import models.BankRepository
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import repositories.BankRepository
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}

@@ -3,7 +3,7 @@ package controllers
 import akka.http.scaladsl.model.DateTime
 import auth.AuthAction
 import com.hhandoko.play.pdf.PdfGenerator
-import models.{BankRepository, Benefit, BenefitRepository, Bill, BillRepository, BillWithData, User, UserRepository, UserWithBank}
+import models.{Benefit, Bill, BillWithData, User, UserWithBank}
 import forms.BenefitForm._
 import forms.BillForm._
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,6 +11,7 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
 import slick.jdbc.JdbcProfile
 import play.api.{Configuration, Environment}
+import repositories.{BankRepository, BenefitRepository, BillRepository, UserRepository}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
