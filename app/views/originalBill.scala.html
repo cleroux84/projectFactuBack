@@ -165,8 +165,10 @@
             <h3>Conditions et modalités de paiement</h3>
             <span>Facture payable</span><span style="font-weight: bolder"> sous 15 jours, </span><span>soit le : @(new SimpleDateFormat("dd-MM-yyyy").format(bill.invoiceDueBy.toDate))</span><br>
             <br>
-            <span style="font-weight: bold">@user.bank.name</span><br>
-            <span style="font-weight: bold">IBAN : @user.bank.iban</span>
+            @if(user.bank.nonEmpty){
+            <span style="font-weight: bold">@user.bank.map(bank => bank.name)</span><br>
+            <span style="font-weight: bold">@user.bank.map(bank => bank.iban)</span>
+            }
         </div>
     </body>
 </html>

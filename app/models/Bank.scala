@@ -9,7 +9,8 @@ case class Bank(
                guichetCode: String,
                account: String,
                ribKey: BigDecimal,
-               iban: String
+               iban: String,
+               userId: Long
                ){
 
 }

@@ -10,11 +10,12 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
 
-  val slickBill: TableQuery[BillTable] = TableQuery[BillTable]
-  val slickCustomer: TableQuery[CustomerTable] = TableQuery[CustomerTable]
-  val slickBenefit: TableQuery[BenefitTable] = TableQuery[BenefitTable]
-  val slickUser: TableQuery[UserTable] = TableQuery[UserTable]
-  val slickBank: TableQuery[BankTable] = TableQuery[BankTable]
+  //DESIGN PATTERN LAZY INITIALIZATION ?? https://pavelfatin.com/design-patterns-in-scala/
+  lazy val slickBill = TableQuery[BillTable]
+  lazy val slickCustomer = TableQuery[CustomerTable]
+  lazy val slickBenefit = TableQuery[BenefitTable]
+  lazy val slickUser = TableQuery[UserTable]
+  lazy val slickBank = TableQuery[BankTable]
 
   class UserTable(tag: Tag) extends Table[User](tag, "user") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
@@ -27,9 +28,10 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def city = column[String]("city")
     def zipCode = column[String]("zipCode")
     def siret = column[String]("siret")
-    def bankId = column[Long]("bankId")
+    def role = column[Int]("role")
+    def authId = column[String]("authId")
 
-    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, bankId) <> ((User.apply _).tupled, User.unapply)
+    def * = (id, civility, firstName, lastName, email, phone, address, city, zipCode, siret, role, authId) <> ((User.apply _).tupled, User.unapply)
 
   }
 
@@ -56,8 +58,11 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def created = column[DateTime]("created")
     def periodCovered = column[String]("periodCovered")
     def billNumber = column[String]("billNumber")
+    def userId = column[Long]("userId")
+    def paid = column[Boolean]("paid")
+    def paymentDate = column[Option[DateTime]]("paymentDate")
 
-    def * = (id, customerId, created, periodCovered, billNumber) <> ((Bill.apply _).tupled, Bill.unapply)
+    def * = (id, customerId, created, periodCovered, billNumber, userId, paid, paymentDate) <> ((Bill.apply _).tupled, Bill.unapply)
   }
 
   class BenefitTable(tag: Tag) extends Table[Benefit](tag, "benefit") {
@@ -79,8 +84,9 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
     def account = column[String]("account")
     def ribKey = column[BigDecimal]("ribKey")
     def iban = column[String]("iban")
+    def userId = column[Long]("userId")
 
-    def * = (id, name, bankCode, guichetCode, account, ribKey, iban) <> ((Bank.apply _).tupled, Bank.unapply)
+    def * = (id, name, bankCode, guichetCode, account, ribKey, iban, userId) <> ((Bank.apply _).tupled, Bank.unapply)
   }
 
 }

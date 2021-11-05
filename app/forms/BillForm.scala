@@ -10,14 +10,20 @@ object BillForm {
                              customerId: Long,
                              created: DateTime,
                              periodCovered: String,
-                             benefits: Seq[CreateBenefitForm]
+                             benefits: Seq[CreateBenefitForm],
+                             userId: Long,
+                             paid: Boolean,
+                             paymentDate: Option[DateTime]
                            ){
     def toBillCustom(yearNumber: String): Bill = Bill(
       id = 0L,
       customerId = this.customerId,
       periodCovered = this.periodCovered,
       billNumber = yearNumber,
-      created = this.created
+      created = this.created,
+      userId = this.userId,
+      paid = this.paid,
+      paymentDate = this.paymentDate
     )
 
   }

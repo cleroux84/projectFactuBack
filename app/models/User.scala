@@ -13,7 +13,8 @@ case class User(
                city: String,
                zipCode: String,
                siret: String,
-               bankId: Long
+               role: Int,
+               authId: String
                ) {
 }
 
@@ -23,11 +24,11 @@ object User {
 
 case class UserWithBank(
                        user: User,
-                       bank: Bank
+                       bank: Option[Bank]
                        )
 object UserWithBank {
   implicit val userWithBank: OFormat[UserWithBank] = Json.format[UserWithBank]
-  def fromUserToBank(user: User, bank: Bank): UserWithBank = {
+  def fromUserToBank(user: User, bank: Option[Bank]): UserWithBank = {
     UserWithBank(
       user = user,
       bank = bank

@@ -3,7 +3,7 @@ package controllers
 import akka.http.scaladsl.model.DateTime
 import auth.AuthAction
 import com.hhandoko.play.pdf.PdfGenerator
-import models.{BankRepository, Benefit, BenefitRepository, Bill, BillRepository, BillWithData, User, UserRepository, UserWithBank}
+import models.{Benefit, Bill, BillWithData, User, UserWithBank}
 import forms.BenefitForm._
 import forms.BillForm._
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,6 +11,7 @@ import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.mvc._
 import slick.jdbc.JdbcProfile
 import play.api.{Configuration, Environment}
+import repositories.{BankRepository, BenefitRepository, BillRepository, UserRepository}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt
@@ -46,15 +47,26 @@ class BillController @Inject()(
     "fonts/Roboto-ThinItalic.ttf",
   ))
 
-  def exportBillPdf(id: Long/*, userId: Long*/): Action[AnyContent] = Action.async { implicit r =>
+  def exportBillPdf(id: Long, userMail: String): Action[AnyContent] = Action.async { implicit r =>
     repo.findBill(id).flatMap { billSeq: Seq[BillWithData] =>
-      repoUser.getUser(1).flatMap { user =>
+      repoUser.getUser(userMail).flatMap { user =>
         repoBank.getBank(user).map { bank =>
-          val userAndBank = UserWithBank.fromUserToBank(user, bank.head)
+          val userAndBank = UserWithBank.fromUserToBank(user, bank)
           pdfGen.ok(views.html.originalBill(billSeq.head, userAndBank), "http://localhost:9000")
         }
       }
     }
+  }
+  def getThisBill(id: Long): Action[AnyContent] = Action.async { implicit r =>
+    repo.findBill(id).map { billSeq =>
+      Ok(Json.toJson(billSeq))
+    }
+  }
+
+  def getBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
+    repo.getListBillByUser(userId).map({ billWithCustomerData =>
+      Ok(Json.toJson(billWithCustomerData))
+    })
   }
 
   def getBills: Action[AnyContent] = authAction.async { implicit request =>
@@ -63,7 +75,31 @@ class BillController @Inject()(
     })
   }
 
-  def addBill: Action[JsValue] = Action.async(parse.json) { implicit request =>
+  def getLateBills: Action[AnyContent] = authAction.async { implicit request =>
+    repo.getLateBills.map({ billWithCustomerData =>
+      Ok(Json.toJson(billWithCustomerData))
+    })
+  }
+
+  def getUnpaidBills: Action[AnyContent] = authAction.async { implicit request =>
+    repo.getUnpaidBills.map({ billSeq =>
+      Ok(Json.toJson(billSeq))
+    })
+  }
+
+  def getUnpaidBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
+    repo.getUnpaidBillsByUser(userId).map({ billSeq =>
+      Ok(Json.toJson(billSeq))
+    })
+  }
+
+  def getLateBillsByUser(userId: Long): Action[AnyContent] = authAction.async { implicit request =>
+    repo.getLateBillByUser(userId).map({ billLate =>
+      Ok(Json.toJson(billLate))
+    })
+  }
+
+  def addBill: Action[JsValue] = authAction.async(parse.json) { implicit request =>
     request.body.validate[CreateBillForm] match {
       case JsSuccess(createBillForm, _) =>
         repo.composeBillNumber().flatMap { number =>
@@ -83,6 +119,14 @@ class BillController @Inject()(
         Future.successful(BadRequest)
       }
     }
+
+  def updatePayment(id: Long): Action[JsValue] = authAction.async(parse.json) { implicit request =>
+    request.body.validate[CreateBillForm] match {
+      case JsSuccess(data, _) =>
+        repo.updatePayment(id, data.paid, data.paymentDate).map(_ => Ok)
+      case JsError(errors) => Future.successful(BadRequest(Json.obj()))
+    }
+  }
 
   //fonctionne mais inutile pour les factures :
   //  def deleteBill(id: Long): Action[AnyContent] = Action.async { implicit request =>

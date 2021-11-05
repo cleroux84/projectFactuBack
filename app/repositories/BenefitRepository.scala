@@ -1,14 +1,16 @@
-package models
-import javax.inject.{Inject, Singleton}
+package repositories
+
+import models.{Benefit, Bill}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import play.api.libs.json.{Json, Reads}
 import services.BillService
 import slick.jdbc.JdbcProfile
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BenefitRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) (implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
+class BenefitRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) (implicit ec: ExecutionContext)
+  extends HasDatabaseConfigProvider[JdbcProfile] with BillService {
   import profile.api._
 
   def addBenefit(benefits: Seq[Benefit]): Future[String] = {

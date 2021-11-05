@@ -15,7 +15,8 @@ object UserForm {
                            city: String,
                            zipCode: String,
                            siret: String,
-                           bankId: Long
+                           role: Int,
+                           authId: String
                            ){
     def toUserCustom: User = User(
       id = 0L,
@@ -28,7 +29,8 @@ object UserForm {
       city = this.city,
       zipCode = this.zipCode,
       siret = this.siret,
-      bankId = this.bankId
+      role = this.role,
+      authId = this.authId
     )
   }
 

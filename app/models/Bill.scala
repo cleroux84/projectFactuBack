@@ -11,6 +11,9 @@ case class Bill(
                  created: DateTime,
                  periodCovered: String,
                  billNumber: String,
+                 userId: Long,
+                 paid: Boolean,
+                 paymentDate: Option[DateTime]
                )
 
 object Bill {
@@ -22,6 +25,7 @@ object Bill {
 
 }
 
+//voir https://gist.github.com/kencoba/1875983 pour créer un pattern decorator
 case class BillWithData(
                  id: Long,
                  customer: Customer,
@@ -31,7 +35,11 @@ case class BillWithData(
                  benefit: Seq[BenefitWithMount],
                  amountHt: BigDecimal,
                  amountTtc: BigDecimal,
-                 invoiceDueBy: DateTime
+                 invoiceDueBy: DateTime,
+                 paid: Boolean,
+                 paymentDate: Option[DateTime],
+                 paymentStatus: String,
+                 userId: Long
                ) {
 }
 
@@ -44,6 +52,7 @@ object BillWithData {
                                 benefit: Seq[BenefitWithMount],
                                 amountHt: BigDecimal,
                                 amountTtc: BigDecimal,
+                                paymentStatus: String,
                                ): BillWithData = {
     BillWithData(
       id = bill.id,
@@ -54,7 +63,11 @@ object BillWithData {
       benefit = benefit,
       amountHt = amountHt,
       amountTtc = amountTtc,
-      invoiceDueBy = (bill.created).plusDays(15)
+      invoiceDueBy = bill.created.plusDays(15),
+      paid= bill.paid,
+      paymentDate = bill.paymentDate,
+      paymentStatus = paymentStatus,
+      userId = bill.userId
     )
   }
 }
