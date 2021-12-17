@@ -20,12 +20,8 @@ object Bill {
   implicit val jodaWrites: Writes[DateTime] = JodaWrites.jodaDateWrites("dd-MM-yyyy")
   implicit val jodaReads: Reads[DateTime] = JodaReads.JodaDateReads
   implicit val billFormat: OFormat[Bill] = Json.format[Bill]
-//  implicit val billWrites = Json.reads[Bill]
-//  implicit val billReads = Json.writes[Bill]
-
 }
 
-//voir https://gist.github.com/kencoba/1875983 pour créer un pattern decorator
 case class BillWithData(
                  id: Long,
                  customer: Customer,

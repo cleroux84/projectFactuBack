@@ -10,7 +10,6 @@ trait BillService extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
 
-  //DESIGN PATTERN LAZY INITIALIZATION ?? https://pavelfatin.com/design-patterns-in-scala/
   lazy val slickBill = TableQuery[BillTable]
   lazy val slickCustomer = TableQuery[CustomerTable]
   lazy val slickBenefit = TableQuery[BenefitTable]

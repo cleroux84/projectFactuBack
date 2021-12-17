@@ -21,7 +21,7 @@ import play.api.test.Helpers.{GET, POST, await, contentAsJson, defaultAwaitTimeo
 import repositories.{BillRepository, CustomerRepository, UserRepository}
 import services.BillService
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext}
 
 
 class UnitSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
